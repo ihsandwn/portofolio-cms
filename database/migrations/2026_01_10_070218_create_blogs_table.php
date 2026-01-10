@@ -20,6 +20,9 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->enum('category', ['tech', 'ai', 'tutorial'])->default('tech');
             $table->timestamp('published_at')->nullable();
+            
+            // Indexes
+            $table->index(['category', 'published_at']);
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
