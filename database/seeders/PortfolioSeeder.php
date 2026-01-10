@@ -1,0 +1,104 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Portfolio;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
+
+class PortfolioSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $portfolios = [
+            // AI / Agentic Entries (Extrapolated & New)
+            [
+                'title' => 'RAG Knowledge retrieval System',
+                'description' => 'A retrieval-augmented generation pipeline using Solr and Vector Databases to provide accurate context for LLMs.',
+                'client' => 'Internal R&D',
+                'type' => 'ai_agent',
+                'tech_stack' => ['Python', 'LangChain', 'Solr', 'OpenAI', 'Pinecone'],
+                'case_study' => "## Problem\nGeneric LLMs lack specific domain knowledge.\n\n## Solution\nLeveraged my experience with Solr (from SKCK Online) to build a hybrid search engine that retrieves key documents before feeding them to GPT-4.\n\n## Outcome\nReduced hallucination rates by 40% and improved answer relevance.",
+                'meta_data' => ['model' => 'GPT-4o', 'vector_db' => 'Pinecone', 'latency' => '800ms'],
+                'completed_at' => '2024-12-01',
+                'is_featured' => true,
+            ],
+            [
+                'title' => 'Automated HR Screening Agent',
+                'description' => 'An autonomous agent that pre-screens resumes and matches them effectively against job descriptions.',
+                'client' => 'Elabram Systems (Concept)',
+                'type' => 'ai_agent',
+                'tech_stack' => ['Laravel', 'OpenAI', 'Livewire', 'PostgreSQL'],
+                'case_study' => "## Context\nBuilding on my HRIS experience, I designed an agentic workflow to automate the initial screening phase.\n\n## Implementation\nThe system parses PDF resumes, extracts key skills, and scores them against the JD using semantic matching.\n\n## Stack\nIntegrated directly into a Laravel queue worker for background processing.",
+                'meta_data' => ['tokens_per_resume' => 1500, 'accuracy' => '85%'],
+                'completed_at' => '2025-01-15',
+                'is_featured' => true,
+            ],
+
+            // Core Web Dev / Architecture (From CV)
+            [
+                'title' => 'SKCK Online Microservices',
+                'description' => 'Architected a high-traffic microservices application for police record checks using Lumen, Vue.js, and Solr.',
+                'client' => 'PT Mitreka Indonesia',
+                'url' => '#',
+                'type' => 'consulting', // Architecture fits consulting/specialist
+                'tech_stack' => ['Lumen', 'Vue.js', 'MongoDB', 'Solr', 'Docker', 'Redis'],
+                'case_study' => "## Architecture\nDesigned a distributed system to handle high concurrency. \n\n## Key Tech\n- **Solr**: For sub-second search queries across millions of records.\n- **Docker**: Reduced environment setup time by 40%.\n- **Gateway**: Express.js gateway for request aggregation.",
+                'completed_at' => '2023-12-01',
+                'is_featured' => true,
+            ],
+            [
+                'title' => 'Satu Data BKPM Portal',
+                'description' => 'Led the development of a scalable open data portal for investment data.',
+                'client' => 'PT Mitreka Indonesia',
+                'url' => 'https://data.bkpm.go.id',
+                'type' => 'web',
+                'tech_stack' => ['Laravel', 'PostgreSQL', 'CKan Integration'],
+                'case_study' => "Built a user-friendly CMS to streamline access to investment data. Focused on data visualization and performance optimization using Laravel's caching mechanisms.",
+                'completed_at' => '2024-06-01', // Estimated
+                'is_featured' => false,
+            ],
+            [
+                'title' => 'HRIS & Job Portal Platform',
+                'description' => 'Engineered a comprehensive platform for recruitment tracking and HR management.',
+                'client' => 'PT Elabram Systems',
+                'url' => 'https://job.elabram.com',
+                'type' => 'web',
+                'tech_stack' => ['Laravel', 'Vue.js', 'PostgreSQL'],
+                'case_study' => "Optimized PostgreSQL queries to reduce data retrieval latency by 20%. Integrated role-based access control for secure HR data management.",
+                'completed_at' => '2023-05-01',
+                'is_featured' => false,
+            ],
+            [
+                'title' => 'Coal Shipping Backend System',
+                'description' => 'Developed backend systems for coal order tracking and supply chain transparency.',
+                'client' => 'PT Barito Integra Teknologi',
+                'type' => 'web',
+                'tech_stack' => ['Laravel', 'Angular', 'MySQL'],
+                'case_study' => "Optimized MySQL performance, reducing query times by 20%. Enhanced supply chain transparency through secure APIs.",
+                'completed_at' => '2020-06-01',
+                'is_featured' => false,
+            ],
+            [
+                'title' => 'SBN Ritel Online',
+                'description' => 'Built a platform for ordering government securities with high transaction integrity.',
+                'client' => 'PT Lawencon (BRI)',
+                'url' => 'https://sbn.bri.co.id',
+                'type' => 'web',
+                'tech_stack' => ['CodeIgniter', 'jQuery', 'Oracle'],
+                'case_study' => "Designed efficient database structures and dashboards, improving transaction processing speed by 15%.",
+                'completed_at' => '2018-10-01',
+                'is_featured' => false,
+            ],
+        ];
+
+        foreach ($portfolios as $portfolio) {
+            Portfolio::create(array_merge($portfolio, [
+                'slug' => Str::slug($portfolio['title']),
+            ]));
+        }
+    }
+}
