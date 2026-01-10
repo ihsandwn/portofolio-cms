@@ -47,9 +47,8 @@
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
                     </div>
                     <h3 class="text-xl font-semibold text-white mb-3">Enterprise Web Architecture</h3>
-                    <p class="text-slate-400 leading-relaxed">
-                        Scalable microservices, robust APIs, and high-performance Laravel applications designed for millions of requests.
-                    </p>
+                        Scalable microservices, robust APIs, and high-performance applications designed for millions of requests.
+
                 </div>
 
                 <!-- Service 2 -->
@@ -59,7 +58,7 @@
                     </div>
                     <h3 class="text-xl font-semibold text-white mb-3">AI Agents & RAG Pipelines</h3>
                     <p class="text-slate-400 leading-relaxed">
-                        Building autonomous agents that understand context, integrating LLMs (OpenAI, Anthropic) with Vector Databases for real business logic.
+                        Building autonomous agents that understand context, integrating advanced LLMs with Vector Databases for real business logic.
                     </p>
                 </div>
 
@@ -70,7 +69,7 @@
                     </div>
                     <h3 class="text-xl font-semibold text-white mb-3">System Optimization</h3>
                     <p class="text-slate-400 leading-relaxed">
-                        Database tuning (PostgreSQL/Solr), containerization (Docker), and CI/CD pipelines to ensure reliability and speed.
+                        Database tuning, containerization, and automated CI/CD pipelines to ensure reliability and speed.
                     </p>
                 </div>
             </div>
@@ -120,18 +119,7 @@
                         
                         <div class="mt-auto">
                             <!-- Tech Stack -->
-                            <div class="flex flex-wrap gap-2 mb-6">
-                                <?php $stack = $portfolio->tech_stack ?? []; ?>
-                                @foreach(array_slice($stack, 0, 3) as $tech)
-                                <span class="text-xs px-2 py-1 bg-slate-800 text-slate-300 rounded border border-slate-700/50">
-                                    {{ $tech }}
-                                </span>
-                                @endforeach
-                                
-                                @if(count($stack) > 3)
-                                <span class="text-xs px-2 py-1 bg-slate-800 text-slate-500 rounded border border-slate-700/50">+{{ count($stack) - 3 }}</span>
-                                @endif
-                            </div>
+                            <!-- Description ends here -->
                             
                             <a href="#" class="inline-flex items-center text-sm font-medium text-indigo-400 hover:text-indigo-300 transition">
                                 View Case Study <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
