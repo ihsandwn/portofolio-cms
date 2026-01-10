@@ -26,6 +26,10 @@ return new class extends Migration
             $table->json('meta_data')->nullable(); // For AI specific stats
             $table->date('completed_at')->nullable();
             $table->boolean('is_featured')->default(false);
+            
+            // Indexes for performance
+            $table->index(['type', 'is_featured']);
+            $table->index('created_at');
             $table->timestamps();
         });
     }
