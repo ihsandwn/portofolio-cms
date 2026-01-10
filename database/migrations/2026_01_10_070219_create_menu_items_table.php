@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('url')->nullable();
             $table->string('route')->nullable();
-            $table->integer('parent_id')->nullable();
+            $table->integer('parent_id')->nullable()->index();
             $table->integer('order')->default(0);
             $table->string('icon')->nullable();
             $table->timestamps();
