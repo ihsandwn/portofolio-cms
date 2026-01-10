@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // e.g., 'main_nav', 'footer'
+            $table->string('name')->unique(); // e.g., 'main_nav', 'footer'
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
