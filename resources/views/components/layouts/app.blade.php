@@ -85,7 +85,7 @@
     <footer class="bg-slate-900 border-t border-slate-800 py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="mt-12 pt-8 border-t border-slate-800 text-center text-slate-500 text-sm">
-                &copy; {{ date('Y') }} Ichsan Dwi Nugraha. Built with Laravel 11 & Alpine.js.
+                &copy; {{ date('Y') }} Ichsan Dwi Nugraha. All rights reserved.
             </div>
         </div>
     </footer>
