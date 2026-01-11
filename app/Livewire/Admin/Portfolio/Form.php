@@ -48,9 +48,8 @@ class Form extends Component
 
     public function mount(Portfolio $portfolio = null)
     {
-        if ($portfolio->exists) {
+        if ($portfolio && $portfolio->exists) {
             $this->portfolio = $portfolio;
-            $this->is_edit = true;
             $this->is_edit = true;
             $this->fill($portfolio->only([
                 'slug', 'type', 'client', 'url', 'repo_url', 'case_study', 'is_featured'
