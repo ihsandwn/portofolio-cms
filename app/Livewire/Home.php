@@ -3,6 +3,9 @@
 namespace App\Livewire;
 
 use App\Models\Portfolio;
+use App\Models\Service;
+use App\Models\Setting;
+use App\Models\Page;
 use Livewire\Component;
 
 class Home extends Component
@@ -29,7 +32,11 @@ class Home extends Component
             ->get();
 
         return view('livewire.home', [
-            'portfolios' => $portfolios
+            'portfolios' => $portfolios,
+            'services' => Service::all(),
+            'hero' => Setting::where('group', 'home')->get()->pluck('value', 'key'),
+            'aboutPage' => Page::where('slug', 'about')->first(),
+            'aiPage' => Page::where('slug', 'ai-lab')->first(),
         ])->layout('components.layouts.app');
     }
 }

@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('portfolios', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->json('title'); // Translatable
             $table->string('slug')->unique();
-            $table->text('description')->nullable(); // Short description
+            $table->json('description')->nullable(); // Translatable
             $table->string('image')->nullable();
             $table->string('client')->nullable();
             $table->string('url')->nullable();
