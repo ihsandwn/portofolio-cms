@@ -28,7 +28,7 @@ class Form extends Component
 
     public function mount(Page $page = null)
     {
-        if ($page->exists) {
+        if ($page && $page->exists) {
             $this->page = $page;
             $this->title = $page->title->getArrayCopy();
             $this->content = $page->content->getArrayCopy();
