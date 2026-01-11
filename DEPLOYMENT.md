@@ -1,6 +1,6 @@
-# 🚀 Deployment Guide (NexusCMS)
+# 🚀 Deployment Guide (CMS Portofolio)
 
-This document outlines the strategy for deploying the NexusCMS application to Staging and Production environments using Docker.
+This document outlines the strategy for deploying the CMS Portofolio application to Staging and Production environments using Docker.
 
 ## 🐳 Docker Architecture
 
@@ -31,7 +31,7 @@ APP_URL=https://your-domain.com
 DB_CONNECTION=pgsql
 DB_HOST=172.17.0.1  # IP of Host or External DB (Do not use localhost inside container)
 DB_PORT=5432
-DB_DATABASE=nexus_prod
+DB_DATABASE=cms_portofolio_prod
 DB_USERNAME=secure_user
 DB_PASSWORD=secure_password
 
@@ -66,6 +66,6 @@ The Nginx configuration is located at `docker/nginx/app.conf`.
 ## 🔄 CI/CD Recommendations
 
 If using GitHub Actions or GitLab CI:
-1.  **Build Image**: `docker build --target prod -t my-registry/nexus-cms:latest .`
+1.  **Build Image**: `docker build --target prod -t my-registry/portfolio-cms:latest .`
 2.  **Push**: Push to your container registry.
 3.  **Deploy**: SSH into your server and run the `docker-compose` command above, pulling the latest image.

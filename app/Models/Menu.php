@@ -11,12 +11,8 @@ class Menu extends Model
 
     protected $fillable = ['name', 'is_active'];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-
     public function items()
     {
-        return $this->hasMany(MenuItem::class)->orderBy('order');
+        return $this->hasMany(MenuItem::class)->whereNull('parent_id')->orderBy('order');
     }
 }

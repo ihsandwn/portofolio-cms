@@ -3,10 +3,9 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', App\Livewire\Home::class)->name('home');
+Route::get('/p/{slug}', App\Livewire\Page::class)->name('page.show');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
@@ -18,6 +17,23 @@ Route::middleware(['auth', 'verified', 'role:super-admin'])->prefix('admin')->na
     Route::get('/portfolios', App\Livewire\Admin\Portfolio\Index::class)->name('portfolios.index');
     Route::get('/portfolios/create', App\Livewire\Admin\Portfolio\Form::class)->name('portfolios.create');
     Route::get('/portfolios/{portfolio}/edit', App\Livewire\Admin\Portfolio\Form::class)->name('portfolios.edit');
+
+    // Services
+    Route::get('/services', App\Livewire\Admin\Service\Index::class)->name('services.index');
+    Route::get('/services/create', App\Livewire\Admin\Service\Form::class)->name('services.create');
+    Route::get('/services/{service}/edit', App\Livewire\Admin\Service\Form::class)->name('services.edit');
+
+    // Settings
+    Route::get('/settings', App\Livewire\Admin\Setting\Index::class)->name('settings.index');
+
+    // Menus
+    Route::get('/menus', App\Livewire\Admin\Menu\Index::class)->name('menus.index');
+    Route::get('/menus/{menu}/builder', App\Livewire\Admin\Menu\Builder::class)->name('menus.builder');
+
+    // Pages
+    Route::get('/pages', App\Livewire\Admin\Page\Index::class)->name('pages.index');
+    Route::get('/pages/create', App\Livewire\Admin\Page\Form::class)->name('pages.create');
+    Route::get('/pages/{page}/edit', App\Livewire\Admin\Page\Form::class)->name('pages.edit');
 
     // Access Control
     Route::get('/users', App\Livewire\Admin\User\Index::class)->name('users.index');

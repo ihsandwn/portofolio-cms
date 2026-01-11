@@ -1,5 +1,5 @@
 
-# 🚀 CMS Portfolio (NexusCMS)
+# 🚀 CMS Portfolio (CMS Portofolio)
 
 A modern, high-performance Content Management System & Personal Portfolio built with **Laravel 11**, **Livewire 3**, and **TailwindCSS**.  
 Featuring a premium "Dark Blue & Electric Blue" SaaS-style Admin Dashboard, AI-ready architecture, and a fully containerized deployment strategy.
@@ -15,7 +15,7 @@ Featuring a premium "Dark Blue & Electric Blue" SaaS-style Admin Dashboard, AI-r
 
 ### 🎨 Premium UI/UX
 -   **Frontend**: Futurustic "Clean Dark" theme with `Slate-950` backgrounds and neon accents.
--   **Admin Panel**: "NexusCMS" Dashboard featuring a detached sidebar, glassmorphism effects, and dynamic data visualization.
+-   **Admin Panel**: "CMS Portofolio" Dashboard featuring a detached sidebar, glassmorphism effects, and dynamic data visualization.
 
 ### 🛠 Tech Stack
 -   **Backend**: Laravel 11, Spatie Permission.

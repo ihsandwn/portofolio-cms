@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('menu_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('menu_id')->constrained()->onDelete('cascade');
-            $table->string('title');
+            $table->json('title'); // Translatable
             $table->string('url')->nullable();
             $table->string('route')->nullable();
             $table->integer('parent_id')->nullable()->index();
