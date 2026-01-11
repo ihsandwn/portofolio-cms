@@ -16,22 +16,24 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Roles & Permissions
-        $role = Role::create(['name' => 'super-admin']);
+        $this->call(RolesAndPermissionsSeeder::class);
         
         // 2. User
         $user = User::factory()->create([
             'name' => 'Ichsan Dwi Nugraha',
             'email' => 'admin@ichsan.dev',
-            'password' => Hash::make('password'), 
+            'password' => Hash::make('P@ssw0rd!~'), 
         ]);
 
-        $user->assignRole($role);
+        $user->assignRole('super-admin');
 
         // 3. Portfolio & Content
         $this->call([
+            ServiceSeeder::class,
+            SettingSeeder::class,
             PortfolioSeeder::class,
-            // ServiceSeeder::class, // Can implement later
-            // MenuSeeder::class,    // Can implement later
+            PageSeeder::class,
+            MenuSeeder::class,
         ]);
         
         // 4. Default Settings (Optional)

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Casts\Translatable;
 
 class Blog extends Model
 {
@@ -22,6 +23,8 @@ class Blog extends Model
 
     protected $casts = [
         'published_at' => 'datetime',
+        'title' => Translatable::class,
+        'content' => Translatable::class,
     ];
 
     public function user()

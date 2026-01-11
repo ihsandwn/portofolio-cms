@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('settings', function (Blueprint $table) {
+        Schema::create('pages', function (Blueprint $table) {
             $table->id();
-            $table->string('key')->unique();
-            $table->json('value')->nullable(); // Translatable value
-            $table->string('type')->default('text'); // text, boolean, image
-            $table->string('group')->default('general'); // site, social, seo
+            $table->string('slug')->unique();
+            $table->json('title'); // Translatable
+            $table->json('content')->nullable(); // Translatable
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('settings');
+        Schema::dropIfExists('pages');
     }
 };
