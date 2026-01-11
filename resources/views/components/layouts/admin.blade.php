@@ -33,9 +33,9 @@
                 
                 <a href="/" class="relative z-10 flex items-center space-x-2 group">
                     <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30 group-hover:scale-110 transition duration-300">
-                        N
+                        P
                     </div>
-                    <span class="text-xl font-bold tracking-tight text-white">NEXUS<span class="text-blue-500">CMS</span></span>
+                    <span class="text-xl font-bold tracking-tight text-white">CMS<span class="text-blue-500">Portofolio</span></span>
                 </a>
             </div>
 
@@ -43,17 +43,44 @@
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
                 <p class="px-4 text-xs font-semibold text-blue-500/80 uppercase tracking-widest mb-2 font-mono">Main Module</p>
                 
+                @can('view_dashboard')
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 group {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600 text-white shadow-[#2563eb66] shadow-lg' : 'text-blue-300/60 hover:bg-blue-900/20 hover:text-blue-200' }}">
                     <svg class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                     <span class="font-medium">Dashboard</span>
                 </a>
+                @endcan
 
                 <p class="px-4 text-xs font-semibold text-blue-500/80 uppercase tracking-widest mt-6 mb-2 font-mono">Content System</p>
 
+                @can('view_portfolios')
                 <a href="{{ route('admin.portfolios.index') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 group {{ request()->routeIs('admin.portfolios.*') ? 'bg-blue-600 text-white shadow-[#2563eb66] shadow-lg' : 'text-blue-300/60 hover:bg-blue-900/20 hover:text-blue-200' }}">
                     <svg class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                     <span class="font-medium">Portfolios</span>
                 </a>
+                @endcan
+                
+                @can('view_services')
+                <a href="{{ route('admin.services.index') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 group {{ request()->routeIs('admin.services.*') ? 'bg-blue-600 text-white shadow-[#2563eb66] shadow-lg' : 'text-blue-300/60 hover:bg-blue-900/20 hover:text-blue-200' }}">
+                    <svg class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    <span class="font-medium">Services</span>
+                </a>
+                @endcan
+
+                @can('view_settings')
+                <a href="{{ route('admin.settings.index') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 group {{ request()->routeIs('admin.settings.*') ? 'bg-blue-600 text-white shadow-[#2563eb66] shadow-lg' : 'text-blue-300/60 hover:bg-blue-900/20 hover:text-blue-200' }}">
+                     <svg class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span class="font-medium">Settings</span>
+                </a>
+                @endcan
+
+                @can('view_menus')
+                <a href="{{ route('admin.menus.index') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 group {{ request()->routeIs('admin.menus.*') ? 'bg-blue-600 text-white shadow-[#2563eb66] shadow-lg' : 'text-blue-300/60 hover:bg-blue-900/20 hover:text-blue-200' }}">
+                    <svg class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <span class="font-medium">Menus</span>
+                </a>
+                @endcan
+
+
                 
                 <a href="#" class="flex items-center px-4 py-3 rounded-xl transition-colors duration-200 text-blue-300/40 hover:bg-blue-900/10 hover:text-blue-300 opacity-60 cursor-not-allowed" title="Coming Soon">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
@@ -62,20 +89,26 @@
 
                 <p class="px-4 text-xs font-semibold text-blue-500/80 uppercase tracking-widest mt-6 mb-2 font-mono">Access Control</p>
 
+                @can('view_users')
                 <a href="{{ route('admin.users.index') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 group {{ request()->routeIs('admin.users.*') ? 'bg-blue-600 text-white shadow-[#2563eb66] shadow-lg' : 'text-blue-300/60 hover:bg-blue-900/20 hover:text-blue-200' }}">
                     <svg class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     <span class="font-medium">Users</span>
                 </a>
+                @endcan
 
+                @can('view_roles')
                 <a href="{{ route('admin.roles.index') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 group {{ request()->routeIs('admin.roles.*') ? 'bg-blue-600 text-white shadow-[#2563eb66] shadow-lg' : 'text-blue-300/60 hover:bg-blue-900/20 hover:text-blue-200' }}">
                      <svg class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                     <span class="font-medium">Roles</span>
                 </a>
+                @endcan
 
+                @can('view_permissions')
                 <a href="{{ route('admin.permissions.index') }}" class="flex items-center px-4 py-3 rounded-xl transition-all duration-300 group {{ request()->routeIs('admin.permissions.index') ? 'bg-blue-600 text-white shadow-[#2563eb66] shadow-lg' : 'text-blue-300/60 hover:bg-blue-900/20 hover:text-blue-200' }}">
                     <svg class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
                     <span class="font-medium">Permissions</span>
                 </a>
+                @endcan
             </nav>
 
             <!-- User Profile (Data) -->
@@ -110,6 +143,11 @@
                 </div>
 
                 <div class="flex items-center space-x-6">
+                    <!-- Language Switcher -->
+                    <div class="mr-4">
+                        <livewire:language-switch />
+                    </div>
+
                     <!-- Status Indicator -->
                     <div class="hidden md:flex items-center space-x-2 bg-blue-900/20 px-3 py-1.5 rounded-full border border-blue-500/20">
                          <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]"></div>

@@ -16,9 +16,9 @@ class Form extends Component
     public $is_edit = false;
 
     // Form Fields
-    public $title;
+    public $title = [];       // Changed to array
     public $slug;
-    public $description;
+    public $description = []; // Changed to array
     public $type = 'web';
     public $client;
     public $url;
@@ -31,9 +31,11 @@ class Form extends Component
     protected function rules()
     {
         return [
-            'title' => 'required|min:3',
+            'title.en' => 'required|min:3',
+            'title.id' => 'nullable|string',
             'slug' => 'required|unique:portfolios,slug,' . ($this->portfolio->id ?? 'NULL'),
-            'description' => 'nullable|max:255',
+            'description.en' => 'nullable|max:255',
+            'description.id' => 'nullable|max:255',
             'type' => 'required|in:web,ai_agent,consulting',
             'client' => 'nullable|string',
             'url' => 'nullable|url',
@@ -49,9 +51,13 @@ class Form extends Component
         if ($portfolio->exists) {
             $this->portfolio = $portfolio;
             $this->is_edit = true;
+            $this->is_edit = true;
             $this->fill($portfolio->only([
-                'title', 'slug', 'description', 'type', 'client', 'url', 'repo_url', 'case_study', 'is_featured'
+                'slug', 'type', 'client', 'url', 'repo_url', 'case_study', 'is_featured'
             ]));
+            // Manually fill translatable arrays
+            $this->title = $portfolio->title->getArrayCopy();
+            $this->description = $portfolio->description->getArrayCopy();
             $this->tech_stack_input = implode(', ', $portfolio->tech_stack ?? []);
         } else {
             $this->portfolio = new Portfolio();
@@ -60,8 +66,8 @@ class Form extends Component
 
     public function updatedTitle($value)
     {
-        if (!$this->is_edit) {
-            $this->slug = Str::slug($value);
+        if (!$this->is_edit && isset($this->title['en'])) {
+            $this->slug = Str::slug($this->title['en']);
         }
     }
 

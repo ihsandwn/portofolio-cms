@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->json('title'); // Translatable
             $table->string('slug')->unique();
-            $table->text('description')->nullable();
-            $table->string('icon')->nullable();
+            $table->json('description')->nullable(); // Translatable
+            $table->string('icon')->nullable(); // SVG code or path
             $table->enum('category', ['web_dev', 'ai_solution', 'system_arch'])->default('web_dev');
             $table->timestamps();
         });

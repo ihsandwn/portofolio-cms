@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Casts\Translatable;
 
 class Portfolio extends Model
 {
@@ -30,6 +31,8 @@ class Portfolio extends Model
         'meta_data' => 'array',
         'completed_at' => 'date',
         'is_featured' => 'boolean',
+        'title' => Translatable::class,
+        'description' => Translatable::class,
     ];
 
     public function getTechStackListAttribute()

@@ -2,14 +2,30 @@
     <form wire:submit="save" class="max-w-4xl mx-auto space-y-6">
         
         <!-- Header -->
-        <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
-            <h2 class="text-lg font-semibold text-slate-100 mb-4">Basic Information</h2>
+        <div class="bg-slate-800 p-6 rounded-lg border border-slate-700" x-data="{ lang: 'en' }">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-slate-100">Basic Information</h2>
+                <!-- Language Tabs -->
+                <div class="flex space-x-1 bg-slate-900 p-1 rounded-lg">
+                    <button type="button" @click="lang = 'en'" :class="lang === 'en' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'" class="px-3 py-1 text-xs font-medium rounded transition">English</button>
+                    <button type="button" @click="lang = 'id'" :class="lang === 'id' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'" class="px-3 py-1 text-xs font-medium rounded transition">Indonesia</button>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Title -->
-                <div>
+                <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-slate-400 mb-1">Project Title</label>
-                    <input wire:model.live="title" type="text" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-2 focus:ring-indigo-500">
-                    @error('title') <span class="text-rose-400 text-xs">{{ $message }}</span> @enderror
+                    <!-- English Input -->
+                    <div x-show="lang === 'en'">
+                        <input wire:model.live="title.en" type="text" placeholder="Title in English" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-2 focus:ring-indigo-500">
+                        @error('title.en') <span class="text-rose-400 text-xs">{{ $message }}</span> @enderror
+                    </div>
+                    <!-- Indonesian Input -->
+                    <div x-show="lang === 'id'" style="display: none;">
+                        <input wire:model.live="title.id" type="text" placeholder="Judul dalam Bahasa Indonesia" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-2 focus:ring-indigo-500">
+                        @error('title.id') <span class="text-rose-400 text-xs">{{ $message }}</span> @enderror
+                    </div>
                 </div>
 
                 <!-- Slug -->
@@ -39,8 +55,14 @@
             <!-- Description -->
             <div class="mt-4">
                 <label class="block text-sm font-medium text-slate-400 mb-1">Short Description</label>
-                <textarea wire:model="description" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-2 focus:ring-indigo-500"></textarea>
-                @error('description') <span class="text-rose-400 text-xs">{{ $message }}</span> @enderror
+                <div x-show="lang === 'en'">
+                    <textarea wire:model="description.en" rows="2" placeholder="Description in English" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-2 focus:ring-indigo-500"></textarea>
+                    @error('description.en') <span class="text-rose-400 text-xs">{{ $message }}</span> @enderror
+                </div>
+                <div x-show="lang === 'id'" style="display: none;">
+                    <textarea wire:model="description.id" rows="2" placeholder="Deskripsi dalam Bahasa Indonesia" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-2 focus:ring-indigo-500"></textarea>
+                    @error('description.id') <span class="text-rose-400 text-xs">{{ $message }}</span> @enderror
+                </div>
             </div>
         </div>
 

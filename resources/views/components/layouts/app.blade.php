@@ -42,17 +42,22 @@
                     <span class="font-bold text-xl tracking-tight text-white">Ichsan<span class="text-cyan-400">.Dev</span></span>
                 </a>
 
+                </a>
+
                 <div class="hidden md:flex space-x-8">
-                    <a href="#about" class="text-sm font-medium text-slate-300 hover:text-white transition">About</a>
-                    <a href="#services" class="text-sm font-medium text-slate-300 hover:text-white transition">Services</a>
-                    <a href="#portfolio" class="text-sm font-medium text-slate-300 hover:text-white transition">Portfolio</a>
-                    <a href="#ai-lab" class="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        AI Lab
-                    </a>
+                    @php
+                        $menu = \App\Models\Menu::where('name', 'primary')->first();
+                        $items = $menu ? $menu->items->load('children') : collect();
+                    @endphp
+
+                    @foreach($items as $item)
+                        <a href="{{ $item->url }}" class="text-sm font-medium {{ request()->is(ltrim($item->url, '/')) ? 'text-white' : 'text-slate-300 hover:text-white' }} transition">{{ $item->title }}</a>
+                    @endforeach
                 </div>
 
-                <div class="hidden md:block">
+                <div class="hidden md:flex items-center space-x-4">
+                    <livewire:language-switch />
+                    
                     <a href="mailto:ichsanworkthings@gmail.com" class="px-5 py-2.5 rounded-full bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium border border-slate-700 transition hover:border-slate-500 hover:shadow-lg">
                         Contact Me
                     </a>
@@ -68,10 +73,18 @@
 
         <div x-show="open" class="md:hidden bg-slate-900 border-b border-slate-800">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800">About</a>
-                <a href="#services" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800">Services</a>
-                <a href="#portfolio" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800">Portfolio</a>
-                <a href="#ai-lab" class="block px-3 py-2 rounded-md text-base font-medium text-cyan-400 hover:text-cyan-300 hover:bg-slate-800">AI Lab</a>
+                @php
+                    $menu = \App\Models\Menu::where('name', 'primary')->first();
+                    $items = $menu ? $menu->items : collect();
+                @endphp
+                
+                @foreach($items as $item)
+                    <a href="{{ $item->url }}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800">{{ $item->title }}</a>
+                @endforeach
+                
+                <div class="px-3 py-2">
+                    <livewire:language-switch />
+                </div>
             </div>
         </div>
     </nav>

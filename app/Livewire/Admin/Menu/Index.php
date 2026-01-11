@@ -1,0 +1,16 @@
+<?php
+
+namespace App\Livewire\Admin\Menu;
+
+use App\Models\Menu;
+use Livewire\Component;
+
+class Index extends Component
+{
+    public function render()
+    {
+        return view('livewire.admin.menu.index', [
+            'menus' => Menu::all()
+        ])->layout('components.layouts.admin');
+    }
+}
