@@ -25,7 +25,7 @@
     </header>
 
     <article class="prose dark:prose-invert max-w-none space-y-8">
-        @foreach($post->content_blocks as $block)
+        @foreach($post->blocks as $block)
             @if($block['type'] === 'text')
                 <x-blog.text :data="$block['data']" />
             @endif

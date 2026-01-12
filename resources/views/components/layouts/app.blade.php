@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -23,7 +24,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-200 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
+<body class="bg-slate-950 text-slate-200 antialiased selection:bg-cyan-500/30 selection:text-cyan-200 flex flex-col min-h-screen">
     
     <div class="fixed inset-0 z-[-1] bg-slate-950 bg-grid pointer-events-none"></div>
     <div class="fixed top-0 left-0 w-full h-full z-[-1] bg-gradient-to-b from-indigo-900/10 to-transparent pointer-events-none"></div>
@@ -51,7 +52,13 @@
                     @endphp
 
                     @foreach($items as $item)
-                        <a href="{{ $item->url }}" class="text-sm font-medium {{ request()->is(ltrim($item->url, '/')) ? 'text-white' : 'text-slate-300 hover:text-white' }} transition">{{ $item->title }}</a>
+                        @php
+                            $url = $item->url;
+                            if (str_starts_with($url, '#') && !request()->is('/')) {
+                                $url = url('/') . $url;
+                            }
+                        @endphp
+                        <a href="{{ $url }}" class="text-sm font-medium {{ request()->is(ltrim($item->url, '/')) ? 'text-white' : 'text-slate-300 hover:text-white' }} transition">{{ $item->title }}</a>
                     @endforeach
                 </div>
 
@@ -79,7 +86,13 @@
                 @endphp
                 
                 @foreach($items as $item)
-                    <a href="{{ $item->url }}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800">{{ $item->title }}</a>
+                    @php
+                        $url = $item->url;
+                        if (str_starts_with($url, '#') && !request()->is('/')) {
+                            $url = url('/') . $url;
+                        }
+                    @endphp
+                    <a href="{{ $url }}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-800">{{ $item->title }}</a>
                 @endforeach
                 
                 <div class="px-3 py-2">
@@ -90,7 +103,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main>
+    <main class="flex-grow">
         {{ $slot }}
     </main>
 

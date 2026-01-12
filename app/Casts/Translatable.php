@@ -15,7 +15,13 @@ class Translatable implements CastsAttributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): TranslatableContent
     {
-        $data = json_decode($value, true) ?: [];
+        $data = json_decode($value, true);
+
+        // Robustness: If decode returns a string (legacy/single value), wrap it in 'en'
+        if (!is_array($data)) {
+            $data = ['en' => $data ?: $value];
+        }
+        
         return new TranslatableContent($data);
     }
 

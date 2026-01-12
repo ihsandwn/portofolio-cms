@@ -55,4 +55,14 @@ Route::middleware(['auth', 'verified', 'role:super-admin'])->prefix('admin')->na
 Route::get('/blog', App\Livewire\Public\Blog\Index::class)->name('blog.index');
 Route::get('/blog/{slug}', App\Livewire\Public\Blog\Show::class)->name('blog.show');
 
+// New Portal Pages
+Route::get('/about', App\Livewire\Public\About::class)->name('about');
+Route::get('/services', App\Livewire\Public\Services\Index::class)->name('services.index');
+
+Route::get('/portfolio', App\Livewire\Public\Portfolio\Index::class)->name('portfolio.index');
+Route::get('/portfolio/{slug}', App\Livewire\Public\Portfolio\Show::class)->name('portfolio.show');
+
+Route::get('/ai-lab', App\Livewire\Public\AiLab\Index::class)->name('ai-lab.index');
+Route::get('/ai-lab/{slug}', App\Livewire\Public\AiLab\Show::class)->name('ai-lab.show');
+
 require __DIR__.'/auth.php';
