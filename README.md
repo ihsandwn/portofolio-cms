@@ -15,13 +15,21 @@ Featuring a premium "Dark Blue & Electric Blue" SaaS-style Admin Dashboard, AI-r
 
 ### 🎨 Premium UI/UX
 -   **Frontend**: Futurustic "Clean Dark" theme with `Slate-950` backgrounds and neon accents.
--   **Admin Panel**: "CMS Portofolio" Dashboard featuring a detached sidebar, glassmorphism effects, and dynamic data visualization.
+-   **Interactive Components**:
+    -   **Flipbook Viewer**: 3D page-turning experience for PDF ebooks.
+    -   **Glassmorphism Carousel**: Smooth image styling with ambient background effects.
+-   **Admin Panel**: Detached sidebar, dynamic data visualization, and full mobile responsiveness.
+
+### 📚 Content System
+-   **Bilingual Support**: Full English & Indonesian localization for Blog Posts.
+-   **Rich Content Builder**: Drag-and-drop support for Text, Galleries, Videos, and PDFs.
+-   **Smart Storage**: Native CPanel compatibility mode (`/storage` route proxy) to bypass hosting restrictions.
 
 ### 🛠 Tech Stack
 -   **Backend**: Laravel 11, Spatie Permission.
 -   **Frontend**: Livewire 3, Volt, TailwindCSS, Alpine.js (v3).
--   **Database**: PostgreSQL (Production) / SQLite or Postgres (Dev).
--   **Cache**: Redis.
+-   **Database**: PostgreSQL / SQLite / MySQL.
+-   **Storage**: Local Filesystem with PHP-based serving fallback.
 
 ---
 
