@@ -45,6 +45,14 @@ Route::middleware(['auth', 'verified', 'role:super-admin'])->prefix('admin')->na
     Route::get('/roles/{role}/edit', App\Livewire\Admin\Role\Form::class)->name('roles.edit');
 
     Route::get('/permissions', App\Livewire\Admin\Permission\Index::class)->name('permissions.index');
+
+    // Blog
+    Route::get('/posts', App\Livewire\Admin\Blog\Index::class)->name('blog.index');
+    Route::get('/posts/create', App\Livewire\Admin\Blog\CreateEdit::class)->name('blog.create');
+    Route::get('/posts/{id}/edit', App\Livewire\Admin\Blog\CreateEdit::class)->name('blog.edit');
 });
+
+Route::get('/blog', App\Livewire\Public\Blog\Index::class)->name('blog.index');
+Route::get('/blog/{slug}', App\Livewire\Public\Blog\Show::class)->name('blog.show');
 
 require __DIR__.'/auth.php';

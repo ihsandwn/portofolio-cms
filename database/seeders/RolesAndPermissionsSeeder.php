@@ -33,6 +33,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage_roles',
             'view_permissions',
             'manage_permissions',
+            'view_permissions',
+            'manage_permissions',
+            'view_blogs',
+            'manage_blogs',
         ];
 
         foreach ($permissions as $permission) {
@@ -50,6 +54,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'view_services', 'manage_services',
             'view_menus', 'manage_menus',
             'view_pages', 'manage_pages',
+            'view_menus', 'manage_menus',
+            'view_pages', 'manage_pages',
+            'view_blogs', 'manage_blogs',
         ]);
 
         // Super Admin
