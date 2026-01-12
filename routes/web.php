@@ -65,20 +65,15 @@ Route::get('/portfolio/{slug}', App\Livewire\Public\Portfolio\Show::class)->name
 Route::get('/ai-lab', App\Livewire\Public\AiLab\Index::class)->name('ai-lab.index');
 Route::get('/ai-lab/{slug}', App\Livewire\Public\AiLab\Show::class)->name('ai-lab.show');
 
-Route::get('/fix-storage', function () {
-    $target = storage_path('app/public');
-    $link = public_path('storage');
-    
-    if (file_exists($link)) {
-        return 'Link already exists. If not working, delete existing "public/storage" folder via File Manager and try again.';
+// Fallback for Shared Hosting (CPanel) where symlink() is disabled
+Route::get('storage/{path}', function ($path) {
+    $filePath = storage_path('app/public/' . $path);
+
+    if (!file_exists($filePath)) {
+        abort(404);
     }
-    
-    try {
-        symlink($target, $link);
-        return 'Storage link created successfully!';
-    } catch (\Throwable $e) {
-        return 'Error: ' . $e->getMessage();
-    }
-});
+
+    return response()->file($filePath);
+})->where('path', '.*');
 
 require __DIR__.'/auth.php';
