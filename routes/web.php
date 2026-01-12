@@ -45,6 +45,24 @@ Route::middleware(['auth', 'verified', 'role:super-admin'])->prefix('admin')->na
     Route::get('/roles/{role}/edit', App\Livewire\Admin\Role\Form::class)->name('roles.edit');
 
     Route::get('/permissions', App\Livewire\Admin\Permission\Index::class)->name('permissions.index');
+
+    // Blog
+    Route::get('/posts', App\Livewire\Admin\Blog\Index::class)->name('blog.index');
+    Route::get('/posts/create', App\Livewire\Admin\Blog\CreateEdit::class)->name('blog.create');
+    Route::get('/posts/{id}/edit', App\Livewire\Admin\Blog\CreateEdit::class)->name('blog.edit');
 });
+
+Route::get('/blog', App\Livewire\Public\Blog\Index::class)->name('blog.index');
+Route::get('/blog/{slug}', App\Livewire\Public\Blog\Show::class)->name('blog.show');
+
+// New Portal Pages
+Route::get('/about', App\Livewire\Public\About::class)->name('about');
+Route::get('/services', App\Livewire\Public\Services\Index::class)->name('services.index');
+
+Route::get('/portfolio', App\Livewire\Public\Portfolio\Index::class)->name('portfolio.index');
+Route::get('/portfolio/{slug}', App\Livewire\Public\Portfolio\Show::class)->name('portfolio.show');
+
+Route::get('/ai-lab', App\Livewire\Public\AiLab\Index::class)->name('ai-lab.index');
+Route::get('/ai-lab/{slug}', App\Livewire\Public\AiLab\Show::class)->name('ai-lab.show');
 
 require __DIR__.'/auth.php';
