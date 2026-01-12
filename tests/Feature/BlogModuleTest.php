@@ -37,8 +37,10 @@ class BlogModuleTest extends TestCase
 
         $this->assertDatabaseHas('blog_posts', [
             'slug' => 'test-blog-post',
-            'title' => 'Test Blog Post'
         ]);
+        
+        $post = \App\Models\BlogPost::where('slug', 'test-blog-post')->first();
+        $this->assertEquals('Test Blog Post', (string)$post->title);
         
         $post = BlogPost::where('slug', 'test-blog-post')->first();
         $this->assertCount(1, $post->content_blocks);

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('blog_posts', function (Blueprint $table) {
             $table->id();
             $table->string('slug')->unique();
-            $table->string('title');
-            $table->text('excerpt')->nullable();
+            $table->json('title');
+            $table->json('excerpt')->nullable();
             $table->json('content_blocks'); // [{"type": "text", ...}, ...]
             $table->json('seo_meta')->nullable(); // {"title": "...", "description": "...", ...}
             $table->foreignId('author_id')->constrained('users')->cascadeOnDelete();

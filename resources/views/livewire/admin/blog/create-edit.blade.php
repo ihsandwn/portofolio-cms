@@ -77,12 +77,20 @@
                                     
                                      @if(isset($block['images']) && is_array($block['images']))
                                         <div class="flex flex-wrap gap-2 mt-2">
-                                            @foreach($block['images'] as $img)
-                                                 @if(is_object($img))
-                                                    <img src="{{ $img->temporaryUrl() }}" class="h-20 w-20 object-cover rounded">
-                                                @elseif(is_string($img))
-                                                    <img src="{{ asset('storage/' . $img) }}" class="h-20 w-20 object-cover rounded">
-                                                @endif
+                                            @foreach($block['images'] as $imgIndex => $img)
+                                                <div class="relative group" wire:key="img-{{ $index }}-{{ $imgIndex }}">
+                                                    @if(is_object($img))
+                                                        <img src="{{ $img->temporaryUrl() }}" class="h-24 w-24 object-cover rounded border border-gray-200 shadow-sm">
+                                                    @elseif(is_string($img))
+                                                        <img src="{{ asset('storage/' . $img) }}" class="h-24 w-24 object-cover rounded border border-gray-200 shadow-sm">
+                                                    @endif
+                                                    
+                                                    <button type="button" 
+                                                            wire:click="removeImage({{ $index }}, {{ $imgIndex }})"
+                                                            class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 focus:outline-none opacity-0 group-hover:opacity-100 transition-all duration-200 transform hover:scale-110">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                    </button>
+                                                </div>
                                             @endforeach
                                         </div>
                                      @endif
