@@ -33,6 +33,11 @@ class MenuSeeder extends Seeder
                 'url' => '#ai-lab',
                 'order' => 4,
             ],
+            [
+                'title' => ['en' => 'Blog', 'id' => 'Blog'],
+                'url' => '/blog',
+                'order' => 5,
+            ],
         ];
 
         foreach ($items as $item) {
