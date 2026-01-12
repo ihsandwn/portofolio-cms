@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
             PortfolioSeeder::class,
             PageSeeder::class,
             MenuSeeder::class,
+            BlogPostSeeder::class,
         ]);
         
         // 4. Default Settings (Optional)

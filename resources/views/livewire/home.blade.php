@@ -117,7 +117,7 @@
                             <!-- Tech Stack -->
                             <!-- Description ends here -->
                             
-                            <a href="#" class="inline-flex items-center text-sm font-medium text-indigo-400 hover:text-indigo-300 transition">
+                            <a href="{{ $portfolio->type === 'ai_agent' ? route('ai-lab.show', $portfolio->slug) : route('portfolio.show', $portfolio->slug) }}" class="inline-flex items-center text-sm font-medium text-indigo-400 hover:text-indigo-300 transition">
                                 View Case Study <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                             </a>
                         </div>

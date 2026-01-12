@@ -38,6 +38,29 @@ class PortfolioSeeder extends Seeder
                 'is_featured' => true,
             ],
 
+            [
+                'title' => ['en' => 'Sentiment Analysis Agent (Alpha)', 'id' => 'Agen Analisis Sentimen (Alpha)'],
+                'description' => ['en' => 'Real-time sentiment analysis of customer feedback using BERT and OpenAI.', 'id' => 'Analisis sentimen umpan balik pelanggan secara real-time menggunakan BERT dan OpenAI.'],
+                'client' => 'Internal Lab',
+                'type' => 'ai_agent',
+                'tech_stack' => ['Python', 'BERT', 'FastAPI', 'React'],
+                'case_study' => "## Overview\nProject Alpha focuses on understanding customer emotion at scale.\n\n## Demo\nInput: 'The service was terrible but the food was great.'\nOutput: Mixed (Service: Negative, Food: Positive).",
+                'meta_data' => ['accuracy' => '92%', 'model' => 'BERT-Base'],
+                'completed_at' => '2025-02-01',
+                'is_featured' => true,
+            ],
+            [
+                'title' => ['en' => 'PDF RAG Chatbot (Beta)', 'id' => 'Chatbot PDF RAG (Beta)'],
+                'description' => ['en' => 'Chat with your PDF documents using a retrieval-augmented generation pipeline.', 'id' => 'Ngobrol dengan dokumen PDF Anda menggunakan pipeline RAG.'],
+                'client' => 'Internal Lab',
+                'type' => 'ai_agent',
+                'tech_stack' => ['LangChain', 'Pinecone', 'OpenAI', 'Streamlit'],
+                'case_study' => "## Overview\nProject Beta allows users to upload manuals and ask questions.\n\n## Architecture\nUses Pinecone for vector storage and GPT-4 for answer synthesis.",
+                'meta_data' => ['context_window' => '16k', 'retrieval_speed' => '400ms'],
+                'completed_at' => '2025-02-15',
+                'is_featured' => true,
+            ],
+
             // Core Web Dev / Architecture (From CV)
             [
                 'title' => ['en' => 'SKCK Online Microservices', 'id' => 'Microservices SKCK Online'],

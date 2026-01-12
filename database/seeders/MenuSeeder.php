@@ -15,23 +15,28 @@ class MenuSeeder extends Seeder
         $items = [
             [
                 'title' => ['en' => 'About', 'id' => 'Tentang'],
-                'url' => '#about',
+                'url' => '/about',
                 'order' => 1,
             ],
             [
                 'title' => ['en' => 'Services', 'id' => 'Layanan'],
-                'url' => '#services',
+                'url' => '/services',
                 'order' => 2,
             ],
             [
                 'title' => ['en' => 'Portfolio', 'id' => 'Portofolio'],
-                'url' => '#portfolio',
+                'url' => '/portfolio',
                 'order' => 3,
             ],
             [
                 'title' => ['en' => 'AI Lab', 'id' => 'Lab AI'],
-                'url' => '#ai-lab',
+                'url' => '/ai-lab',
                 'order' => 4,
+            ],
+            [
+                'title' => ['en' => 'Blog', 'id' => 'Artikel'],
+                'url' => '/blog',
+                'order' => 5,
             ],
         ];
 

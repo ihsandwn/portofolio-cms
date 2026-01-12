@@ -65,10 +65,10 @@
                     <svg class="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                     New Portfolio
                  </a>
-                 <button class="px-6 py-3 bg-[#0f1525] hover:bg-blue-900/30 text-blue-200 border border-blue-900/50 rounded-xl font-bold transition flex items-center group hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-0.5 transform duration-200">
+                 <a href="{{ route('admin.blog.create') }}" class="px-6 py-3 bg-[#0f1525] hover:bg-blue-900/30 text-blue-200 border border-blue-900/50 rounded-xl font-bold transition flex items-center group hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/10 hover:-translate-y-0.5 transform duration-200">
                     <svg class="w-5 h-5 mr-2 group-hover:text-cyan-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                     Write Blog
-                 </button>
+                 </a>
             </div>
         </div>
     </div>
