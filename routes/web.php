@@ -64,6 +64,7 @@ Route::get('/portfolio/{slug}', App\Livewire\Public\Portfolio\Show::class)->name
 
 Route::get('/ai-lab', App\Livewire\Public\AiLab\Index::class)->name('ai-lab.index');
 Route::get('/ai-lab/{slug}', App\Livewire\Public\AiLab\Show::class)->name('ai-lab.show');
+Route::get('/ai-lab/auth/{token}', [App\Http\Controllers\Auth\AiLabAuthController::class, 'validateAndRedirect'])->name('ai-lab.auth');
 
 // Fallback for Shared Hosting (CPanel) where symlink() is disabled
 Route::get('storage/{path}', function ($path) {
