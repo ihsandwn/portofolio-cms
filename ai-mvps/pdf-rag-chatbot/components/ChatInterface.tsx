@@ -11,9 +11,10 @@ interface Message {
 interface ChatInterfaceProps {
     documentId: string;
     language?: 'en' | 'id';
+    documentText: string;
 }
 
-export default function ChatInterface({ documentId, language = 'en' }: ChatInterfaceProps) {
+export default function ChatInterface({ documentId, language = 'en', documentText }: ChatInterfaceProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -41,7 +42,8 @@ export default function ChatInterface({ documentId, language = 'en' }: ChatInter
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    documentId,
+                    documentId, // Still sending ID for logging/reference if needed, though backend uses text
+                    documentText, // Send full text for stateless processing
                     question: input,
                     history: messages,
                     language,
