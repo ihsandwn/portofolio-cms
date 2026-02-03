@@ -8,16 +8,10 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
     try {
-        const { documentId, question, history = [], language = 'en' } = await request.json();
+        const { documentText, question, history = [], language = 'en' } = await request.json();
 
-        if (!documentId || !question) {
-            return NextResponse.json({ error: 'documentId and question are required' }, { status: 400 });
-        }
-
-        // Get document
-        const doc = getDocument(documentId);
-        if (!doc) {
-            return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+        if (!documentText || !question) {
+            return NextResponse.json({ error: 'documentText and question are required' }, { status: 400 });
         }
 
         // Create streaming response
@@ -25,7 +19,7 @@ export async function POST(request: NextRequest) {
         const stream = new ReadableStream({
             async start(controller) {
                 try {
-                    const chatStream = await streamChatWithDocument(doc.text, question, history, language);
+                    const chatStream = await streamChatWithDocument(documentText, question, history, language);
 
                     for await (const chunk of chatStream) {
                         const text = chunk.text();
