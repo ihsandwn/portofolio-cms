@@ -5,7 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import { Upload, File, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 interface PDFUploaderProps {
-    onUploadSuccess: (documentId: string, filename: string) => void;
+    onUploadSuccess: (documentId: string, filename: string, text: string) => void;
 }
 
 export default function PDFUploader({ onUploadSuccess }: PDFUploaderProps) {
@@ -36,7 +36,7 @@ export default function PDFUploader({ onUploadSuccess }: PDFUploaderProps) {
                 throw new Error(data.error || 'Upload failed');
             }
 
-            onUploadSuccess(data.document.id, data.document.filename);
+            onUploadSuccess(data.document.id, data.document.filename, data.document.text);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Upload failed');
             setFile(null);

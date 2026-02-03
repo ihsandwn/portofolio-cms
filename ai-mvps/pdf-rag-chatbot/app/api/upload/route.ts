@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
             document: {
                 id: doc.id,
                 filename: doc.filename,
+                text: doc.text, // Return full text for stateless operation
                 textLength: doc.text.length,
                 uploadedAt: doc.uploadedAt,
             },

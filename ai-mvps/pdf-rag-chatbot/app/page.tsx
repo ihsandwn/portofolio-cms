@@ -12,10 +12,12 @@ export default function Home() {
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [language, setLanguage] = useState<Language>('en');
   const [documentName, setDocumentName] = useState<string>('');
+  const [documentText, setDocumentText] = useState<string>('');
 
-  const handleUploadSuccess = (id: string, name: string) => {
+  const handleUploadSuccess = (id: string, name: string, text: string) => {
     setDocumentId(id);
     setDocumentName(name);
+    setDocumentText(text);
   };
 
   return (
@@ -71,8 +73,8 @@ export default function Home() {
                 {language === 'en' ? 'Chat with Document' : 'Ngobrol dengan Dokumen'}
               </h2>
             </div>
-            {documentId ? (
-              <ChatInterface documentId={documentId} language={language} />
+            {documentId && documentText ? (
+              <ChatInterface documentId={documentId} language={language} documentText={documentText} />
             ) : (
               <div className="flex flex-col items-center justify-center h-64 text-center">
                 <FileText className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
