@@ -67,8 +67,8 @@ class SettingSeeder extends Seeder
             [
                 'key' => 'hero_cta_cv',
                 'value' => [
-                    'en' => 'Download CV',
-                    'id' => 'Unduh CV',
+                    'en' => 'View CV',
+                    'id' => 'Lihat CV',
                 ],
                 'type' => 'text',
                 'group' => 'home',
