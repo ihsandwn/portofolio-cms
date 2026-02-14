@@ -1,29 +1,32 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Laravel') }} — Admin</title>
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
-        <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
-            <div>
-                <a href="/" wire:navigate>
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-                </a>
-            </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
-                {{ $slot }}
+        <style>
+            body { font-family: 'Inter', system-ui, sans-serif; }
+        </style>
+    </head>
+    <body class="antialiased bg-slate-950 text-slate-200">
+        <div class="min-h-screen flex flex-col sm:justify-center items-center px-4 py-12">
+            <a href="/" wire:navigate class="mb-8 flex items-center gap-2 text-slate-400 hover:text-white transition">
+                <span class="font-mono text-sm">&larr; Back to site</span>
+            </a>
+            <div class="w-full sm:max-w-md">
+                <div class="bg-slate-900/80 backdrop-blur border border-slate-800 rounded-xl p-8 shadow-xl">
+                    {{ $slot }}
+                </div>
+                <p class="mt-6 text-center text-xs text-slate-500">Secure admin access · CMS Portfolio</p>
             </div>
         </div>
     </body>

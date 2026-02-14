@@ -19,8 +19,8 @@ class Index extends Component
         return view('livewire.public.portfolio.index', [
             'portfolios' => $portfolios
         ])->layout('components.layouts.app', [
-            'title' => 'Portfolio',
-            'description' => 'Selected web development and architecture projects.'
+            'title' => __('Portfolio'),
+            'description' => __('Portfolio Description'),
         ]);
     }
 }

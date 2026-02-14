@@ -14,8 +14,8 @@ class About extends Component
         return view('livewire.public.about', [
             'page' => $page
         ])->layout('components.layouts.app', [
-            'title' => $page->title,
-            'description' => strip_tags($page->content)
+            'title' => (string) $page->title,
+            'description' => \Illuminate\Support\Str::limit(strip_tags((string) $page->content), 160),
         ]);
     }
 }

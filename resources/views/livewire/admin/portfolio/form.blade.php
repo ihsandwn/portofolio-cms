@@ -87,7 +87,7 @@
 
             <!-- Tech Stack -->
             <div class="mt-4">
-                <label class="block text-sm font-medium text-slate-400 mb-1">Tech Stack (Comma users separated)</label>
+                <label class="block text-sm font-medium text-slate-400 mb-1">Tech Stack (comma-separated)</label>
                 <input wire:model="tech_stack_input" type="text" placeholder="Laravel, Vue.js, Tailwind, OpenAI" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-slate-100 focus:ring-2 focus:ring-indigo-500">
                 <p class="text-xs text-slate-500 mt-1">Separate technologies with commas.</p>
             </div>

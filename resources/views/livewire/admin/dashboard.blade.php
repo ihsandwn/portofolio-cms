@@ -12,7 +12,7 @@
                 </div>
             </div>
             <div class="mt-4 flex items-center text-xs text-blue-300/60">
-                <span class="text-emerald-400 font-bold mr-1 flex items-center"><svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> 12%</span> vs last month
+                <span class="text-blue-200/80">Manage from Portfolios</span>
             </div>
         </div>
 
@@ -33,18 +33,18 @@
         </div>
 
         <!-- Stats Card 3 -->
-        <div class="bg-[#0a101f] p-6 rounded-2xl border border-blue-900/30 hover:border-emerald-500/50 transition duration-300 relative overflow-hidden group shadow-lg shadow-black/20">
-            <div class="absolute -right-6 -top-6 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all duration-500"></div>
+        <div class="bg-[#0a101f] p-6 rounded-2xl border border-blue-900/30 hover:border-sky-500/50 transition duration-300 relative overflow-hidden group shadow-lg shadow-black/20">
+            <div class="absolute -right-6 -top-6 w-32 h-32 bg-sky-500/10 rounded-full blur-2xl group-hover:bg-sky-500/20 transition-all duration-500"></div>
             
             <h3 class="text-blue-400/80 text-xs font-bold uppercase tracking-widest mb-1">System Status</h3>
             <div class="flex items-end justify-between mt-2 relative z-10">
-                <p class="text-4xl font-black text-emerald-400 tracking-tight">OK</p>
-                <div class="p-2.5 bg-blue-900/20 rounded-xl text-emerald-400 border border-emerald-500/10 group-hover:border-emerald-500/30 transition">
+                <p class="text-4xl font-black text-sky-400 tracking-tight">OK</p>
+                <div class="p-2.5 bg-blue-900/20 rounded-xl text-sky-400 border border-sky-500/10 group-hover:border-sky-500/30 transition">
                      <svg class="w-6 h-6 transform group-hover:scale-110 transition duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
             </div>
             <div class="mt-4 flex items-center text-xs text-blue-300/60">
-                <span class="text-emerald-400 font-bold mr-1 animate-pulse">●</span> All systems operational
+                <span class="text-sky-400 font-bold mr-1 animate-pulse">●</span> All systems operational
             </div>
         </div>
     </div>

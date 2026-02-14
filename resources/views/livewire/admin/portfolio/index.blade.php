@@ -36,7 +36,7 @@
                     </td>
                     <td class="px-6 py-4">
                         @if($portfolio->is_featured)
-                            <span class="text-emerald-400">Yes</span>
+                            <span class="text-sky-400">Yes</span>
                         @else
                             <span class="text-slate-600">No</span>
                         @endif
