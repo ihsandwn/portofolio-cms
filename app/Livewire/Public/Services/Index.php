@@ -12,8 +12,8 @@ class Index extends Component
         return view('livewire.public.services.index', [
             'services' => Service::all()
         ])->layout('components.layouts.app', [
-            'title' => 'Services',
-            'description' => 'Professional Web Development and AI Solutions.'
+            'title' => __('Services'),
+            'description' => __('Services Description'),
         ]);
     }
 }

@@ -27,7 +27,7 @@
                     Demonstration / Case Study
                 </h2>
                 <div class="prose prose-lg prose-invert max-w-none prose-headings:text-cyan-400 prose-a:text-indigo-400">
-                    {!! Str::markdown($project->case_study ?? '') !!}
+                    @safeHtml(Str::markdown($project->case_study ?? ''))
                 </div>
             </div>
         </div>
@@ -63,10 +63,10 @@
                 <div class="flex flex-col gap-3">
                     @if($project->url)
                         @if($accessRequested)
-                            <div class="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/40 rounded-xl p-4 text-center animate-pulse">
-                                <h4 class="text-emerald-400 font-bold text-lg mb-2">Access Granted! 🚀</h4>
+                            <div class="bg-gradient-to-r from-sky-500/20 to-blue-500/20 border border-sky-500/40 rounded-xl p-4 text-center animate-pulse">
+                                <h4 class="text-sky-400 font-bold text-lg mb-2">Access Granted! 🚀</h4>
                                 <p class="text-slate-300 text-sm mb-4">Your secure session is ready.</p>
-                                <a href="{{ $generatedUrl }}" target="_blank" class="block w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold transition shadow-lg shadow-emerald-500/20">
+                                <a href="{{ $generatedUrl }}" target="_blank" class="block w-full px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold transition shadow-lg shadow-blue-500/20">
                                     Continue to App &rarr;
                                 </a>
                             </div>

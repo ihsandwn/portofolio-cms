@@ -48,7 +48,7 @@
                         </td>
                         <td class="px-6 py-4">
                             @foreach($user->roles as $role)
-                                <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">
                                     {{ $role->name }}
                                 </span>
                             @endforeach

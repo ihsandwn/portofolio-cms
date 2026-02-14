@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Helpers\Sanitizer;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Blade;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Blade::directive('safeHtml', function (string $expression): string {
+            return "<?php echo App\Helpers\Sanitizer::clean($expression); ?>";
+        });
     }
 }

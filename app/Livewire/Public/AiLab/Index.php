@@ -19,8 +19,8 @@ class Index extends Component
         return view('livewire.public.ai-lab.index', [
             'projects' => $projects
         ])->layout('components.layouts.app', [
-            'title' => 'AI Lab',
-            'description' => 'Experimental AI Agents and RAG Pipelines.'
+            'title' => __('AI Lab'),
+            'description' => __('AI Lab Description'),
         ]);
     }
 }
