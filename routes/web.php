@@ -66,14 +66,17 @@ Route::get('/ai-lab', App\Livewire\Public\AiLab\Index::class)->name('ai-lab.inde
 Route::get('/ai-lab/{slug}', App\Livewire\Public\AiLab\Show::class)->name('ai-lab.show');
 Route::get('/ai-lab/auth/{token}', [App\Http\Controllers\Auth\AiLabAuthController::class, 'validateAndRedirect'])->name('ai-lab.auth');
 
-// Fallback for Shared Hosting (CPanel) where symlink() is disabled
-Route::get('storage/{path}', function ($path) {
-    $filePath = storage_path('app/public/' . $path);
-
-    if (!file_exists($filePath)) {
+// Fallback for Shared Hosting (cPanel) where symlink() is disabled
+// OWASP: Path traversal prevention - ensure path stays within storage/app/public
+Route::get('storage/{path}', function (string $path) {
+    $basePath = realpath(storage_path('app/public'));
+    if ($basePath === false || ! is_dir($basePath)) {
         abort(404);
     }
-
+    $filePath = realpath(storage_path('app/public/' . $path));
+    if ($filePath === false || ! str_starts_with($filePath, $basePath) || ! is_file($filePath)) {
+        abort(404);
+    }
     return response()->file($filePath);
 })->where('path', '.*');
 
