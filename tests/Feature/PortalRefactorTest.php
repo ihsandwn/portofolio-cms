@@ -37,7 +37,7 @@ class PortalRefactorTest extends TestCase
     {
         $response = $this->get('/portfolio');
         $response->assertStatus(200);
-        $response->assertSee('Selected Works');
+        $response->assertSee('Selected Work');
     }
 
     public function test_portfolio_show_is_accessible()

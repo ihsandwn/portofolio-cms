@@ -42,6 +42,6 @@
     </header>
 
     <article class="prose prose-lg prose-invert max-w-none">
-        {!! Str::markdown($portfolio->case_study ?? '') !!}
+        @safeHtml(Str::markdown($portfolio->case_study ?? ''))
     </article>
 </div>

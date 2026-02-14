@@ -3,7 +3,7 @@
         <h1 class="text-4xl md:text-5xl font-bold text-white mb-8">{{ $page->title }}</h1>
         
         <div class="prose prose-lg prose-invert max-w-none">
-            {!! $page->content !!}
+            @safeHtml($page->content ?? '')
         </div>
     </div>
 </div>
