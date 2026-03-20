@@ -60,11 +60,13 @@ Featuring a premium "Dark Blue & Electric Blue" SaaS-style Admin Dashboard, AI-r
     composer install && npm install
     ```
 
-2.  **Run Dev Servers**
+2.  **Run dev stack**
     ```bash
-    npm run dev
-    php artisan serve
+    composer dev
     ```
+    Uses **`npm run watch`** so assets are built to `public/build` (same origin as Laravel). If you need Vite HMR on port 5173 instead, run **`composer dev:vite`** (may conflict with strict CSP — see `docs/CSP-TROUBLESHOOTING.md`).
+
+    Or manually: `npm run watch` + `php artisan serve`, or `npm run dev` + `php artisan serve` for full Vite.
 
 ---
 
