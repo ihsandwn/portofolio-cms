@@ -1,14 +1,16 @@
-<div class="flex items-center gap-1 p-1 rounded-lg bg-slate-800/60 border border-slate-700/60">
+<div class="flex items-center gap-0.5 p-0.5 bg-surface-container-high border border-outline-variant/30">
     <button
         wire:click="switch('en')"
-        class="px-2.5 py-1 text-xs font-medium rounded-md transition {{ app()->getLocale() === 'en' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-700/50' }}"
+        type="button"
+        class="px-2.5 py-1 font-label text-[10px] font-semibold uppercase tracking-wider transition-colors duration-blueprint {{ app()->getLocale() === 'en' ? 'bg-primary text-on-primary' : 'text-secondary hover:text-on-background hover:bg-surface-container-low' }}"
         aria-label="English"
     >
         EN
     </button>
     <button
         wire:click="switch('id')"
-        class="px-2.5 py-1 text-xs font-medium rounded-md transition {{ app()->getLocale() === 'id' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-700/50' }}"
+        type="button"
+        class="px-2.5 py-1 font-label text-[10px] font-semibold uppercase tracking-wider transition-colors duration-blueprint {{ app()->getLocale() === 'id' ? 'bg-primary text-on-primary' : 'text-secondary hover:text-on-background hover:bg-surface-container-low' }}"
         aria-label="Indonesian"
     >
         ID
