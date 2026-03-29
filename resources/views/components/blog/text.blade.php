@@ -1,5 +1,5 @@
 @props(['data'])
 
-<div class="blog-text text-gray-800 dark:text-gray-200 leading-relaxed mb-6">
+<div class="blog-text text-on-background leading-relaxed mb-6 prose-blueprint">
     {!! clean($data) !!}
 </div>
