@@ -4,8 +4,77 @@
 
 [x-cloak] { display: none !important; }
 
-.content-section h3 { font-size: 1.25rem; font-weight: 600; color: rgb(255 255 255); }
-.content-section h4 { font-size: 1.125rem; font-weight: 500; color: rgb(226 232 240); }
-.content-section p { line-height: 1.75; }
-.content-section ul { list-style-type: disc; padding-left: 1.5rem; }
-.content-section li { margin-top: 0.5rem; }
+.mono-num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+}
+
+.blueprint-grid {
+    background-image: radial-gradient(circle, rgb(171 179 183 / 0.35) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+.content-section h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: rgb(43 52 55);
+}
+
+.content-section h4 {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: rgb(88 96 100);
+}
+
+.content-section p {
+    line-height: 1.75;
+    color: rgb(43 52 55);
+}
+
+.content-section ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+}
+
+.content-section li {
+    margin-top: 0.5rem;
+}
+
+/* Markdown / rich text blocks (replaces dark-only prose-invert) */
+.prose-blueprint {
+    @apply max-w-none text-on-background leading-relaxed;
+}
+
+.prose-blueprint h1,
+.prose-blueprint h2,
+.prose-blueprint h3 {
+    @apply font-headline font-bold text-on-background mt-8 mb-3;
+}
+
+.prose-blueprint h2 {
+    @apply text-2xl;
+}
+
+.prose-blueprint h3 {
+    @apply text-xl;
+}
+
+.prose-blueprint p {
+    @apply mb-4 text-on-background;
+}
+
+.prose-blueprint a {
+    @apply text-primary underline decoration-outline-variant/50 underline-offset-2 hover:text-primary-dim;
+}
+
+.prose-blueprint ul {
+    @apply list-disc ps-6 mb-4 space-y-1;
+}
+
+.prose-blueprint code {
+    @apply font-mono text-sm bg-surface-container px-1 py-0.5 text-on-background;
+}
+
+.prose-blueprint pre {
+    @apply bg-surface-container p-4 overflow-x-auto text-sm border border-outline-variant/20 mb-4;
+}

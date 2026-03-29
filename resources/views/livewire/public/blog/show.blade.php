@@ -1,30 +1,29 @@
-<div class="max-w-4xl mx-auto pt-32 py-12 px-4 sm:px-6 lg:px-8">
-    <!-- Breadcrumb -->
-    <nav class="flex mb-8 text-sm text-gray-500 dark:text-gray-400" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-2">
+<div class="max-w-4xl mx-auto pt-32 py-12 px-4 sm:px-6 lg:px-10">
+    <nav class="flex mb-8 font-label text-[10px] uppercase tracking-wider text-secondary" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center flex-wrap gap-x-2 gap-y-1">
             <li class="inline-flex items-center">
-                <a href="/" class="hover:text-blue-600 dark:hover:text-white transition-colors">Home</a>
+                <a href="/" wire:navigate class="hover:text-primary transition-colors duration-blueprint">Home</a>
             </li>
             <li>
-                <span class="mx-2">/</span>
+                <span class="text-outline-variant mx-1">/</span>
             </li>
             <li class="inline-flex items-center">
-                <a href="{{ route('blog.index') }}" class="hover:text-blue-600 dark:hover:text-white transition-colors">Blog</a>
+                <a href="{{ route('blog.index') }}" wire:navigate class="hover:text-primary transition-colors duration-blueprint">Blog</a>
             </li>
             <li>
-                <span class="mx-2">/</span>
+                <span class="text-outline-variant mx-1">/</span>
             </li>
             <li aria-current="page">
-                <span class="text-gray-900 dark:text-white font-medium truncate max-w-[200px] sm:max-w-md block">{{ $post->title }}</span>
+                <span class="text-on-background font-headline font-medium truncate max-w-[200px] sm:max-w-md block">{{ $post->title }}</span>
             </li>
         </ol>
     </nav>
 
-    <header class="mb-8 text-center">
-        <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white mb-4">{{ $post->title }}</h1>
+    <header class="mb-8">
+        <h1 class="font-headline text-4xl font-extrabold text-on-background mb-4">{{ $post->title }}</h1>
     </header>
 
-    <article class="prose dark:prose-invert max-w-none space-y-8">
+    <article class="max-w-none space-y-8 text-on-background">
         @foreach($post->blocks as $block)
             @if($block['type'] === 'text')
                 <x-blog.text :data="$block['data']" />

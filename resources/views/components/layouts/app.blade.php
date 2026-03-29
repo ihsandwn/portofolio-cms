@@ -18,9 +18,23 @@
         'sameAs' => ['https://www.linkedin.com/in/ichsan-dwi-nugraha-694a6a114'],
         'description' => $siteDescription,
     ];
+    $wireNavigate = function (string $url): bool {
+        if (str_starts_with($url, '#')) {
+            return false;
+        }
+        if (str_starts_with($url, 'mailto:') || str_starts_with($url, 'tel:')) {
+            return false;
+        }
+        if (str_starts_with($url, '/') && ! str_starts_with($url, '//')) {
+            return true;
+        }
+        $base = rtrim(config('app.url'), '/');
+
+        return str_starts_with($url, $base . '/') || $url === $base;
+    };
 @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -52,39 +66,35 @@
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     {{-- JSON-LD Structured Data --}}
     <script type="application/ld+json">{!! json_encode($jsonLd, JSON_UNESCAPED_SLASHES) !!}</script>
-
-    <style>
-        body { font-family: 'DM Sans', system-ui, sans-serif; }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-        .bg-dots {
-            background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
-            background-size: 24px 24px;
-        }
-    </style>
 </head>
-<body class="bg-slate-950 text-slate-200 antialiased selection:bg-blue-500/30 selection:text-blue-100 flex flex-col min-h-screen">
-    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-500 focus:text-slate-900 focus:rounded-lg focus:outline-none">{{ __('Skip to content') }}</a>
+<body class="bg-surface text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container flex flex-col min-h-screen">
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-on-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface">{{ __('Skip to content') }}</a>
 
-    <div class="fixed inset-0 z-[-1] bg-slate-950 bg-dots pointer-events-none"></div>
+    <div class="fixed inset-0 z-[-1] bg-surface blueprint-grid pointer-events-none opacity-60"></div>
+    <div class="fixed top-0 left-6 h-full w-px bg-outline-variant/10 pointer-events-none z-0 hidden sm:block" aria-hidden="true"></div>
+    <div class="fixed top-0 right-6 h-full w-px bg-outline-variant/10 pointer-events-none z-0 hidden sm:block" aria-hidden="true"></div>
 
     <nav x-data="{ open: false, scrolled: false }"
          x-on:scroll.window="scrolled = (window.pageYOffset > 16)"
-         :class="scrolled ? 'bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80' : 'bg-transparent'"
-         class="fixed w-full z-50 transition-all duration-300">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <a href="{{ url('/') }}" class="flex items-center gap-2.5 group" aria-label="{{ $siteName }} - Home">
-                    <span class="w-9 h-9 rounded-lg bg-blue-500/90 flex items-center justify-center text-slate-900 font-bold text-sm font-mono group-hover:bg-blue-400 transition">IDN</span>
-                    <span class="font-semibold text-lg text-white tracking-tight">{{ $siteName }}</span>
+         :class="scrolled ? 'bg-surface-container-lowest/80 backdrop-blur-md border-b border-outline-variant/30' : 'bg-transparent border-b border-transparent'"
+         class="fixed w-full z-50 transition-all duration-blueprint border-b">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between h-16 items-center gap-4">
+                <a href="{{ url('/') }}"
+                   @if($wireNavigate(url('/'))) wire:navigate @endif
+                   class="flex items-center gap-2.5 group shrink-0 min-w-0"
+                   aria-label="{{ $siteName }} - Home">
+                    <span class="w-8 h-8 shrink-0 bg-primary flex items-center justify-center text-on-primary font-bold text-[10px] font-label tracking-tighter group-hover:bg-primary-dim transition-colors duration-blueprint">IDN</span>
+                    <span class="font-label text-sm font-bold tracking-tighter uppercase text-on-background truncate">{{ $siteName }}</span>
                 </a>
 
-                <div class="hidden md:flex items-center gap-6">
+                <div class="hidden md:flex items-center gap-8">
                     @php
                         $menu = \App\Models\Menu::where('name', 'primary')->first();
                         $items = $menu ? $menu->items->load('children') : collect();
@@ -95,34 +105,55 @@
                             if (str_starts_with($url, '#') && !request()->is('/')) {
                                 $url = url('/') . $url;
                             }
+                            $useNavigate = $wireNavigate($url);
                         @endphp
-                        <a href="{{ $url }}" class="text-sm font-medium text-slate-300 hover:text-white transition">{{ $item->title }}</a>
+                        <a href="{{ $url }}"
+                           @if($useNavigate) wire:navigate @endif
+                           class="font-headline text-[10px] uppercase tracking-[0.2em] font-medium text-secondary hover:text-on-background transition-colors duration-blueprint">{{ $item->title }}</a>
                     @endforeach
 
                     <livewire:language-switch />
 
-                    <a href="mailto:ichsanworkthings@gmail.com" class="px-4 py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-white text-sm font-medium border border-slate-700/80 transition">
+                    <span class="text-outline hidden lg:inline-flex" aria-hidden="true">
+                        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </span>
+
+                    <a href="mailto:ichsanworkthings@gmail.com"
+                       class="px-4 py-2 bg-primary text-on-primary font-label text-[10px] tracking-widest uppercase hover:bg-primary-dim transition-colors duration-blueprint shrink-0">
                         {{ __('Contact Me') }}
                     </a>
                 </div>
 
-                <button x-on:click="open = !open" class="md:hidden p-2 text-slate-400 hover:text-white rounded-lg" aria-label="Toggle menu">
+                <button type="button" x-on:click="open = !open" class="md:hidden p-2 text-on-surface-variant hover:text-on-background transition-colors duration-blueprint" aria-label="{{ __('Toggle menu') }}">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
             </div>
         </div>
 
-        <div x-show="open" x-cloak class="md:hidden bg-slate-900/95 border-t border-slate-800">
-            <div class="px-4 py-4 space-y-2">
+        <div x-show="open"
+             x-cloak
+             x-transition:enter="transition ease-out duration-blueprint"
+             x-transition:enter-start="opacity-0 -translate-y-1"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-blueprint"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-1"
+             class="md:hidden bg-surface-container-lowest border-t border-outline-variant/30">
+            <div class="px-4 py-4 space-y-1">
                 @php $menu = \App\Models\Menu::where('name', 'primary')->first(); $items = $menu ? $menu->items : collect(); @endphp
                 @foreach($items as $item)
-                    @php $url = str_starts_with($item->url, '#') && !request()->is('/') ? url('/') . $item->url : $item->url; @endphp
-                    <a href="{{ $url }}" class="block px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">{{ $item->title }}</a>
+                    @php
+                        $url = str_starts_with($item->url, '#') && !request()->is('/') ? url('/') . $item->url : $item->url;
+                        $useNavigate = $wireNavigate($url);
+                    @endphp
+                    <a href="{{ $url }}"
+                       @if($useNavigate) wire:navigate @endif
+                       class="block px-4 py-3 font-headline text-xs uppercase tracking-widest text-secondary hover:text-on-background hover:bg-surface-container-low transition-colors duration-blueprint">{{ $item->title }}</a>
                 @endforeach
-                <div class="pt-2 border-t border-slate-800">
+                <div class="pt-3 mt-3 border-t border-outline-variant/20">
                     <livewire:language-switch />
                 </div>
-                <a href="mailto:ichsanworkthings@gmail.com" class="block px-4 py-3 rounded-lg bg-slate-800 text-white font-medium">{{ __('Contact Me') }}</a>
+                <a href="mailto:ichsanworkthings@gmail.com" class="block px-4 py-3 mt-2 bg-primary text-on-primary font-label text-[10px] tracking-widest uppercase text-center">{{ __('Contact Me') }}</a>
             </div>
         </div>
     </nav>
@@ -131,23 +162,18 @@
         {{ $slot }}
     </main>
 
-    <footer class="bg-slate-900/50 border-t border-slate-800/80">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <footer class="bg-surface-container-low border-t border-outline-variant/20">
+        <div class="max-w-7xl mx-auto px-6 py-10 md:py-12">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-                <div class="text-center md:text-left">
-                    <span class="font-semibold text-white">{{ $siteName }}</span>
-                    <span class="text-slate-500 mx-2">·</span>
-                    <span class="text-slate-500 text-sm">{{ __('Architect & AI Specialist') }}</span>
-                </div>
-                <div class="flex items-center gap-6">
+                <p class="font-label text-[9px] tracking-widest uppercase text-outline text-center md:text-left leading-relaxed max-w-md">
+                    &copy; {{ date('Y') }} {{ strtoupper($siteName) }} / {{ __('Architect & AI Specialist') }}
+                </p>
+                <div class="flex flex-wrap items-center justify-center gap-6 md:gap-8">
                     <livewire:language-switch />
-                    <a href="mailto:ichsanworkthings@gmail.com" class="text-slate-400 hover:text-blue-400 text-sm transition">{{ __('Contact Me') }}</a>
-                    <a href="https://www.linkedin.com/in/ichsan-dwi-nugraha-694a6a114" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-blue-400 text-sm transition" aria-label="LinkedIn">LinkedIn</a>
+                    <a href="mailto:ichsanworkthings@gmail.com" class="font-label text-[9px] tracking-widest uppercase text-outline hover:text-primary transition-colors duration-blueprint underline decoration-outline-variant/40 underline-offset-2">{{ __('Contact Me') }}</a>
+                    <a href="https://www.linkedin.com/in/ichsan-dwi-nugraha-694a6a114" target="_blank" rel="noopener noreferrer" class="font-label text-[9px] tracking-widest uppercase text-outline hover:text-primary transition-colors duration-blueprint underline decoration-outline-variant/40 underline-offset-2" aria-label="LinkedIn">LinkedIn</a>
                 </div>
             </div>
-            <p class="mt-8 pt-6 border-t border-slate-800 text-center text-slate-500 text-sm">
-                &copy; {{ date('Y') }} {{ $siteName }}. {{ __('Footer Rights') }}
-            </p>
         </div>
     </footer>
 </body>

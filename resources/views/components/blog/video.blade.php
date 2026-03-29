@@ -16,7 +16,7 @@
 @endphp
 
 <div class="blog-video mb-8">
-    <div class="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-lg bg-black">
+    <div class="aspect-w-16 aspect-h-9 overflow-hidden border border-outline-variant/20 bg-inverse-surface">
         <iframe src="{{ $embedUrl }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="w-full h-full"></iframe>
     </div>
 </div>

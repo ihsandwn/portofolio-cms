@@ -2,24 +2,22 @@
 
 <div x-data="pdfFlipper('{{ asset('storage/' . $file) }}')" class="my-8">
     <!-- Trigger Card -->
-    <div class="relative group cursor-pointer bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-indigo-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10"
+    <div class="relative group cursor-pointer bg-surface-container-lowest border border-outline-variant/20 overflow-hidden hover:border-primary/40 transition-colors duration-blueprint"
          @click="openViewer">
         <div class="flex items-center p-6">
-            <div class="flex-shrink-0 mr-6">
-                <!-- Book Icon / Mockup -->
-                <div class="w-16 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow-lg flex items-center justify-center transform group-hover:-translate-y-1 transition duration-300">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            <div class="shrink-0 mr-6">
+                <div class="w-16 h-20 bg-primary flex items-center justify-center transform group-hover:bg-primary-dim transition-colors duration-blueprint">
+                    <svg class="w-8 h-8 text-on-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                 </div>
             </div>
-            <div class="flex-1">
-                <h4 class="text-xl font-bold text-white mb-2 group-hover:text-indigo-400 transition">{{ $title ?? 'Ebook Resource' }}</h4>
-                <p class="text-slate-400 text-sm mb-4">Click to read this interactive book.</p>
-                <span class="inline-flex items-center text-sm font-bold text-indigo-400 uppercase tracking-wider">
-                    Read Now <span class="ml-2">&rarr;</span>
+            <div class="flex-1 min-w-0">
+                <h4 class="text-xl font-headline font-bold text-on-background mb-2 group-hover:text-primary transition-colors duration-blueprint">{{ $title ?? 'Ebook Resource' }}</h4>
+                <p class="text-secondary text-sm mb-4">{{ __('Click to read this interactive book.') }}</p>
+                <span class="inline-flex items-center font-label text-[10px] font-bold text-primary uppercase tracking-widest">
+                    {{ __('Read Now') }} <span class="ml-2">&rarr;</span>
                 </span>
             </div>
-            <!-- Background Decoration -->
-            <div class="absolute right-0 top-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+            <div class="absolute right-0 top-0 w-32 h-32 bg-primary-container/30 blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
         </div>
     </div>
 

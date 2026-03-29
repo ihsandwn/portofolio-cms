@@ -10,13 +10,13 @@
         <!-- No images -->
     @elseif($count === 1)
         <!-- Single Image -->
-        <div class="rounded-lg overflow-hidden shadow-md">
+        <div class="overflow-hidden border border-outline-variant/20">
              @php $img = $images[0]; $src = is_string($img) ? asset('storage/'.$img) : $img->temporaryUrl(); @endphp
             <img src="{{ $src }}" alt="Blog Image" class="w-full h-auto object-cover" loading="lazy">
         </div>
     @else
         <!-- Carousel (Alpine.js) -->
-        <div x-data="{ activeSlide: 0, slides: {{ json_encode(array_map(fn($i) => asset('storage/'.$i), $images)) }} }" class="relative rounded-lg overflow-hidden shadow-md bg-gray-900 group h-[600px]">
+        <div x-data="{ activeSlide: 0, slides: {{ json_encode(array_map(fn($i) => asset('storage/'.$i), $images)) }} }" class="relative overflow-hidden border border-outline-variant/20 bg-inverse-surface group h-[600px]">
             
             <!-- 1. Ambient Background Layer (Fixed behind slides) -->
             <!-- We use a transition on the SRC change or simple crossfade if possible, but for now simple binding is stable -->
