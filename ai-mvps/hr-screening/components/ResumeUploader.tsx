@@ -2,13 +2,14 @@
 
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileText, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Upload, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import type { ScreeningApiResponse } from '@/lib/schemas';
 
 export type Language = 'en' | 'id';
 
 interface ResumeUploaderProps {
     jobDescription: string;
-    onScreeningComplete: (result: any) => void;
+    onScreeningComplete: (result: ScreeningApiResponse) => void;
     language: Language;
 }
 
@@ -41,13 +42,13 @@ export default function ResumeUploader({ jobDescription, onScreeningComplete, la
                 body: formData,
             });
 
-            const data = await response.json();
+const data = await response.json();
 
             if (!response.ok) {
                 throw new Error(data.error || (language === 'en' ? 'Screening failed' : 'Screening gagal'));
             }
 
-            onScreeningComplete(data);
+            onScreeningComplete(data as ScreeningApiResponse);
         } catch (err) {
             setError(err instanceof Error ? err.message : (language === 'en' ? 'Screening failed' : 'Screening gagal'));
             setFileName(null);
@@ -67,6 +68,8 @@ export default function ResumeUploader({ jobDescription, onScreeningComplete, la
         <div className="space-y-4">
             <div
                 {...getRootProps()}
+                aria-busy={screening}
+                aria-label={language === 'en' ? 'Upload PDF resume' : 'Unggah resume PDF'}
                 className={`
           border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all
           ${isDragActive
@@ -76,15 +79,15 @@ export default function ResumeUploader({ jobDescription, onScreeningComplete, la
           ${screening ? 'opacity-50 cursor-not-allowed' : ''}
         `}
             >
-                <input {...getInputProps()} disabled={screening} />
+                <input {...getInputProps()} disabled={screening} aria-label={language === 'en' ? 'Select PDF resume' : 'Pilih resume PDF'} />
 
                 <div className="flex flex-col items-center gap-3">
-                    {screening ? (
-                        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
-                    ) : fileName ? (
-                        <CheckCircle className="w-12 h-12 text-green-500" />
-                    ) : (
-                        <Upload className="w-12 h-12 text-gray-400" />
+{screening ? (
+                         <Loader2 aria-hidden="true" className="w-12 h-12 text-blue-500 animate-spin" />
+) : fileName ? (
+                        <CheckCircle aria-hidden="true" className="w-12 h-12 text-green-500" />
+) : (
+                        <Upload aria-hidden="true" className="w-12 h-12 text-gray-400" />
                     )}
 
                     <div>
@@ -124,7 +127,7 @@ export default function ResumeUploader({ jobDescription, onScreeningComplete, la
 
             {error && (
                 <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                    <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                    <AlertCircle aria-hidden="true" className="w-5 h-5 text-red-500 flex-shrink-0" />
                     <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
                 </div>
             )}

@@ -1,169 +1,113 @@
 # PDF RAG Chatbot - MVP
 
-A simplified AI-powered PDF chatbot that lets you upload PDF documents and ask questions about them using Google Gemini AI.
+A Next.js RAG chatbot: upload PDFs, server extracts & chunks text, stores in-memory embeddings, and answers questions with source citations using Google Gemini AI and Laravel Sanctum authentication.
 
-## Features
+## Security hardening
 
-✅ **PDF Upload** - Drag & drop interface with file validation  
-✅ **Text Extraction** - Automatic PDF text extraction  
-✅ **AI Chat** - Ask questions about your documents  
-✅ **Streaming Responses** - Real-time AI answers  
-✅ **Modern UI** - Beautiful gradient design with dark mode support
+- Laravel access token revalidated server-side before auth cookie issuance and on every upload/chat request.
+- In-memory per-IP+token rate limiting: 10 requests / 10 minutes (process-local; use shared store for horizontal production).
+- PDF uploads require `%PDF-` magic bytes, `.pdf` extension, 10 MB limit, max pages & extracted text length enforced.
+- Prompt injection defense: uploaded document text wrapped in untrusted-input delimiters; embedded instructions ignored.
+- Zod validates request bodies, Gemini output (structured JSON mode), and client response boundaries.
+- Generic client errors; no provider or infrastructure details leaked.
+- CSP, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `Permissions-Policy`, `poweredByHeader: false`.
 
-## Tech Stack
+## RAG architecture (MVP)
 
-- **Next.js** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first styling
-- **Gemini 2.5-Flash** - AI model for chat
-- **pdf-parse** - PDF text extraction
-- **Lucide React** - Icons
+1. Upload parses PDF into pages, chunks with overlap, embeds chunks via Gemini embedding model.
+2. In-memory server store holds document ID, page texts, chunk embeddings, and metadata.
+3. Chat: user question is embedded, cosine similarity retrieves top-K relevant chunks, prompt grounded **only** in retrieved context with page/chunk source citations streamed back.
+4. Browser never sends full document text after upload; only question + session context.
 
-## Getting Started
+**Limitation:** store is process-local and vanishes on cold start. Replace with Supabase/pgvector or vector DB for persistent production.
 
-### 1. Start Development Server
+## Quick start
 
 ```bash
+npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open `http://localhost:3000` through Laravel AI Lab access.
 
-### 2. Upload a PDF
+Required env (in `.env.local`):
 
-- Drag and drop a PDF file (max 10MB)
-- Wait for processing to complete
+```
+GEMINI_API_KEY=...
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_EMBEDDING_MODEL=text-embedding-004
+LARAVEL_API_URL=http://localhost:8000
+NEXT_PUBLIC_LARAVEL_API_URL=http://localhost:8000
+# optional override
+# LARAVEL_TOKEN_VERIFY_URL=http://localhost:8000/api/validate-token
+```
 
-### 3. Chat with Your Document
+## Validation
 
-- Ask questions about the PDF content
-- Get AI-powered answers in real-time
+```bash
+npm test
+npm run lint
+npm run typecheck
+npm run build
+```
 
-## Environment Variables
+## API
 
-All credentials are already configured in `.env.local`:
+### POST /api/auth/verify
 
-- `GEMINI_API_KEY` - Google Gemini API key
-- `GEMINI_MODEL` - gemini-2.5-flash
-- `NEXT_PUBLIC_LARAVEL_API_URL` - Laravel CMS endpoint
+Internal endpoint used by callback to re-validate Laravel token.
 
-## Project Structure
+### POST /api/upload
+
+`multipart/form-data` — `file` (PDF, 10 MB max). Returns `{ success, document: { id, filename, pageCount, chunkCount, uploadedAt } }`.
+
+### POST /api/chat
+
+JSON `{ documentId, question, history?, language }`. Streams text response with inline `[pN]` source citations referencing uploaded pages.
+
+### GET /api/health
+
+Public liveness probe.
+
+## Project structure
 
 ```
 pdf-rag-chatbot/
 ├── app/
 │   ├── api/
-│   │   ├── upload/route.ts    # PDF upload endpoint
-│   │   ├── chat/route.ts      # Chat with streaming
-│   │   └── health/route.ts    # Health check
-│   ├── layout.tsx             # Root layout
-│   └── page.tsx               # Main page
+│   │   ├── auth/verify/route.ts   # Laravel token verification
+│   │   ├── chat/route.ts          # Streaming RAG chat
+│   │   ├── health/route.ts
+│   │   └── upload/route.ts        # PDF ingest & embedding
+│   ├── layout.tsx
+│   └── page.tsx
 ├── components/
-│   ├── PDFUploader.tsx        # File upload component
-│   └── ChatInterface.tsx      # Chat UI with streaming
+│   ├── ChatInterface.tsx
+│   ├── LanguageToggle.tsx
+│   └── PDFUploader.tsx
 ├── lib/
-│   ├── gemini.ts              # Gemini AI client
-│   ├── pdf-processor.ts       # PDF text extraction
-│   └── storage.ts             # In-memory storage
-└── .env.local                 # Environment variables
+│   ├── auth.ts                    # Laravel token validation
+│   ├── gemini.ts                  # Gemini client (chat + embeddings)
+│   ├── pdf-processor.ts           # PDF parse, magic bytes, chunking
+│   ├── rag.ts                     # In-memory store + cosine retrieval
+│   ├── rate-limit.ts              # Baseline per-process limiter
+│   ├── schemas.ts                 # Zod request/response/AI types
+│   └── storage.ts                 # (compat shim)
+├── tests/
+│   └── hardening.test.ts
+├── vitest.config.ts
+├── next.config.ts
+├── eslint.config.mjs
+├── tsconfig.json
+└── package.json
 ```
 
-## API Endpoints
+## Next steps
 
-### POST /api/upload
-Upload and process a PDF file.
-
-**Request:** `multipart/form-data` with `file` field  
-**Response:**
-```json
-{
-  "success": true,
-  "document": {
-    "id": "uuid",
-    "filename": "example.pdf",
-    "textLength": 5000,
-    "uploadedAt": "2026-01-31T..."
-  }
-}
-```
-
-### POST /api/chat
-Chat with the uploaded document.
-
-**Request:**
-```json
-{
-  "documentId": "uuid",
-  "question": "What is this document about?",
-  "history": []
-}
-```
-
-**Response:** Streamed text response
-
-### GET /api/health
-Health check endpoint.
-
-## Current Limitations (Simplified MVP)
-
-- ⚠️ **In-Memory Storage** - Documents reset on server restart
-- ⚠️ **No Vector Embeddings** - Uses full document context
-- ⚠️ **Single Document** - One document at a time
-- ⚠️ **No Authentication** - Public access only
-
-## Next Steps (Full RAG Version)
-
-- [ ] Add Supabase PostgreSQL storage with pgvector
-- [ ] Implement vector embeddings for longer documents
-- [ ] Support multiple documents
-- [ ] Add NextAuth.js authentication with Laravel CMS
-- [ ] Add chat history persistence
-- [ ] Deploy to Vercel
-
-## Testing
-
-1. **Health Check:**
-   ```bash
-   curl http://localhost:3000/api/health
-   ```
-
-2. **Upload a PDF:**
-   - Open http://localhost:3000
-   - Drag and drop any PDF file
-   - Verify "File uploaded successfully" message
-
-3. **Chat:**
-   - Type a question about the PDF
-   - Verify streaming AI response
-
-## Troubleshooting
-
-**Port 3000 already in use?**
-```bash
-# Change port in package.json
-"dev": "next dev -p 3001"
-```
-
-**PDF upload fails?**
-- Check file size (max 10MB)
-- Check file type (must be .pdf)
-- Check console for errors
-
-**Chat not working?**
-- Verify `GEMINI_API_KEY` in `.env.local`
-- Check browser console for errors
-- Check server logs in terminal
-
-## Built With
-
-This is a simplified MVP. The full version will include:
-- Vector embeddings with pgvector
-- Multi-document support
-- Authentication with Laravel CMS
-- Persistent storage with Supabase
-- Enhanced RAG capabilities
-
----
-
-**Ready to use!** 🚀  
-Open http://localhost:3000 and start chatting with your PDFs!
+- [ ] Replace in-memory store with Supabase pgvector or managed vector DB
+- [ ] Add chat history persistence (Supabase/PostgreSQL)
+- [ ] Multi-document sessions
+- [ ] Document deletion + retention policy
+- [ ] Export conversation / sources
+- [ ] Deploy to Vercel with shared Redis rate limiter
+- [ ] Add abuse/billing observability

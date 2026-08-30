@@ -3,6 +3,15 @@
 .env
 .env.backup
 .env.production
+.env.local
+.env.*.local
+.env.*.secret
+
+# AI MVP local secrets and test output
+ai-mvps/**/.env*
+ai-mvps/GEMINI_API_TEST_RESULTS.md
+ai-mvps/**/test-results/
+ai-mvps/**/coverage/
 .phpactor.json
 .phpunit.result.cache
 /.fleet
