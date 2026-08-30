@@ -1,11 +1,12 @@
 'use client';
 
-import { CheckCircle, XCircle, AlertCircle, TrendingUp, Award, BookOpen, Lightbulb, AlertTriangle } from 'lucide-react';
+import { CheckCircle, XCircle, TrendingUp, Award, BookOpen, Lightbulb, AlertTriangle } from 'lucide-react';
+import type { ScreeningApiResponse } from '@/lib/schemas';
 
 export type Language = 'en' | 'id';
 
 interface ScreeningResultsProps {
-    result: any | null;
+    result: ScreeningApiResponse | null;
     language: Language;
 }
 

@@ -1,91 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { extractTextFromPDF, sanitizeText } from '@/lib/pdf-processor';
+import { chunkPages } from '@/lib/rag';
+import { embedText } from '@/lib/gemini';
+import { extractTextFromPDF, hasPdfMagicBytes, MAX_PAGES, MAX_TEXT_LENGTH, sanitizeText } from '@/lib/pdf-processor';
 import { saveDocument } from '@/lib/storage';
 
-// Force Node.js runtime (pdf-parse requires Node.js APIs)
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE || '10485760'); // 10MB
+const MAX_FILE_SIZE = Number(process.env.MAX_FILE_SIZE ?? 10 * 1024 * 1024);
+const genericError = { error: 'Unable to process upload' };
 
 export async function POST(request: NextRequest) {
-    console.log('[UPLOAD] Request received');
-
-    try {
-        console.log('[UPLOAD] Parsing form data...');
-        const formData = await request.formData();
-        const file = formData.get('file') as File;
-
-        console.log('[UPLOAD] File:', file ? file.name : 'NO FILE');
-
-        if (!file) {
-            console.log('[UPLOAD] Error: No file provided');
-            return NextResponse.json({ error: 'No file provided' }, { status: 400 });
-        }
-
-        // Validate file type
-        console.log('[UPLOAD] File type:', file.type);
-        if (file.type !== 'application/pdf') {
-            console.log('[UPLOAD] Error: Invalid file type');
-            return NextResponse.json({ error: 'Only PDF files are allowed' }, { status: 400 });
-        }
-
-        // Validate file size
-        console.log('[UPLOAD] File size:', file.size, 'bytes');
-        if (file.size > MAX_FILE_SIZE) {
-            console.log('[UPLOAD] Error: File too large');
-            return NextResponse.json(
-                { error: `File size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB` },
-                { status: 400 }
-            );
-        }
-
-        // Convert to buffer
-        console.log('[UPLOAD] Converting to buffer...');
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        console.log('[UPLOAD] Buffer size:', buffer.length);
-
-        // Extract text
-        console.log('[UPLOAD] Extracting text from PDF...');
-        const rawText = await extractTextFromPDF(buffer);
-        console.log('[UPLOAD] Raw text length:', rawText?.length || 0);
-
-        const text = sanitizeText(rawText);
-        console.log('[UPLOAD] Sanitized text length:', text?.length || 0);
-
-        if (!text || text.length === 0) {
-            console.log('[UPLOAD] Error: No text extracted');
-            return NextResponse.json({ error: 'No text could be extracted from PDF' }, { status: 400 });
-        }
-
-        // Save document
-        console.log('[UPLOAD] Saving document...');
-        const id = crypto.randomUUID();
-        const doc = saveDocument(id, file.name, text);
-        console.log('[UPLOAD] Document saved:', doc.id);
-
-        return NextResponse.json({
-            success: true,
-            document: {
-                id: doc.id,
-                filename: doc.filename,
-                text: doc.text, // Return full text for stateless operation
-                textLength: doc.text.length,
-                uploadedAt: doc.uploadedAt,
-            },
-        });
-    } catch (error) {
-        console.error('[UPLOAD] ERROR:', error);
-        console.error('[UPLOAD] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-        console.error('[UPLOAD] Error message:', error instanceof Error ? error.message : String(error));
-
-        return NextResponse.json(
-            {
-                error: error instanceof Error ? error.message : 'Failed to process PDF',
-                details: error instanceof Error ? error.stack : String(error)
-            },
-            { status: 500 }
-        );
-    }
+  try {
+    const file = (await request.formData()).get('file');
+    if (!(file instanceof File) || file.size === 0 || file.size > MAX_FILE_SIZE) return NextResponse.json(genericError, { status: 400 });
+    const buffer = Buffer.from(await file.arrayBuffer());
+    if (!hasPdfMagicBytes(buffer)) return NextResponse.json(genericError, { status: 400 });
+    const pages = await extractTextFromPDF(buffer);
+    if (pages.length > MAX_PAGES) return NextResponse.json(genericError, { status: 400 });
+    const cleanPages = pages.map(page => ({ ...page, text: sanitizeText(page.text) }));
+    if (cleanPages.reduce((n, page) => n + page.text.length, 0) > MAX_TEXT_LENGTH) return NextResponse.json(genericError, { status: 400 });
+    const chunks = chunkPages(cleanPages);
+    if (!chunks.length) return NextResponse.json(genericError, { status: 400 });
+    for (const chunk of chunks) chunk.embedding = await embedText(chunk.text);
+    const document = saveDocument({ id: crypto.randomUUID(), filename: file.name.replace(/[^a-zA-Z0-9._-]/g, '_'), chunks, uploadedAt: new Date().toISOString() });
+    return NextResponse.json({ success: true, document: { id: document.id, filename: document.filename, chunkCount: chunks.length, uploadedAt: document.uploadedAt } });
+  } catch { return NextResponse.json(genericError, { status: 500 }); }
 }

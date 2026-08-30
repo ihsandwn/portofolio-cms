@@ -1,138 +1,56 @@
-# Image Caption & Categorizer - MVP 3
+# Image Caption
 
-AI-powered image captioning and categorization using Google Gemini Vision AI.
+Authenticated Next.js image captioning app backed by Google Gemini Vision and Laravel Sanctum.
 
-## Features
-
-✅ **Image Upload** - Drag & drop with instant preview  
-✅ **AI Captions** - Auto-generated descriptive captions  
-✅ **Smart Titles** - Short, catchy titles  
-✅ **Auto Categorization** - AI-detected tags and categories  
-✅ **Object Detection** - Identify main subjects in image  
-✅ **Color Palette** - Extract dominant colors  
-✅ **Mood Analysis** - Detect atmosphere and feeling  
-✅ **Dark Blue Theme** - Matches Laravel CMS design
-
-## Tech Stack
-
-- **Next.js** - React framework
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **Gemini 2.5-Flash (Vision)** - AI image analysis
-- **React Dropzone** - File upload
-- **Lucide React** - Icons
-
-## Getting Started
-
-### 1. Start Development Server
+## Setup
 
 ```bash
+npm install
 npm run dev
 ```
 
-Open [http://localhost:3002](http://localhost:3002)
+Configure environment variables:
 
-### 2. Upload & Analyze
-
-- Drag and drop an image (JPG, PNG, WebP, GIF)
-- Or click to browse (max 10MB)
-- View AI-generated captions and categories instantly!
-
-## Project Structure
-
-```
-image-caption/
-├── app/
-│   ├── api/
-│   │   ├── caption/route.ts    # Image analysis endpoint
-│   │   └── health/route.ts     # Health check
-│   ├── layout.tsx              # Root layout
-│   └── page.tsx                # Main page
-├── components/
-│   ├── ImageUploader.tsx       # Drag & drop uploader
-│   └── CaptionResults.tsx      # Results visualization
-├── lib/
-│   └── gemini-vision.ts        # Gemini Vision AI client
-└── .env.local                  # Environment variables
+```env
+GEMINI_API_KEY=your_key
+GEMINI_MODEL=gemini-2.5-flash
+LARAVEL_API_URL=http://localhost:8000
+NEXT_PUBLIC_LARAVEL_API_URL=http://localhost:8000
+# Optional complete verification endpoint override:
+# LARAVEL_TOKEN_VERIFY_URL=http://localhost:8000/api/validate-token
 ```
 
-## API Endpoints
+Laravel sends users to `/auth/callback?token=...`. Callback verifies token server-side before setting a 10-minute `HttpOnly`, `SameSite=Lax` cookie. Middleware revalidates protected page and caption requests with Laravel. `/api/health` remains public.
 
-### POST /api/caption
-Analyze image and generate captions.
+## Security
 
-**Request:** `multipart/form-data` with `file` field
+- Caption route requires Laravel token verification and has baseline per-process IP rate limiting.
+- Uploads allow only JPEG, PNG, WebP, and GIF up to 10MB. Extension, declared MIME type, and magic bytes must agree.
+- Gemini receives image data in memory; images are not persisted.
+- Gemini uses JSON response mode. Zod validates AI output and shared API types.
+- Generic client errors avoid leaking provider or server details.
+- CSP, frame denial, MIME sniffing prevention, referrer, and permissions headers are configured.
 
-**Response:**
-```json
-{
-  "success": true,
-  "title": "Sunset Over Mountains",
-  "caption": "A breathtaking view of golden sunset...",
-  "categories": ["nature", "landscape", "sunset"],
-  "objects": ["mountains", "sky", "clouds"],
-  "colors": ["orange", "purple", "blue"],
-  "mood": "Peaceful and serene",
-  "imageUrl": "data:image/jpeg;base64,...",
-  "generatedAt": "2026-01-31T..."
-}
+For horizontally scaled production deployments, replace in-memory rate limiting with a shared Redis-backed limiter.
+
+## API
+
+`POST /api/caption` accepts `multipart/form-data`:
+
+- `file`: one supported image, max 10MB
+- `language`: `en` or `id`
+
+Successful responses contain `success`, `filename`, `title`, `caption`, `categories`, `objects`, `colors`, `mood`, and `captionedAt`.
+
+## Validation
+
+```bash
+npm test
+npm run lint
+npm run typecheck
+npm run build
 ```
 
-### GET /api/health
-Health check endpoint.
+## Supported languages
 
-## How It Works
-
-1. **Upload**: User drops an image
-2. **Convert**: Image converted to base64
-3. **Gemini Vision**: AI analyzes image content
-4. **Extract**: Parse structured data from AI
-5. **Display**: Beautiful visualization with categories, colors, mood
-
-## Features in Detail
-
-### Caption Generation
-- **Detailed Caption**: 1-2 sentence description
-- **Short Title**: 5-7 words catchy title
-- **Context-aware**: Understands scene and subjects
-
-### Categorization
-- **Smart Tags**: Relevant category tags
-- **Auto-detect**: Categories based on content
-- **Visual Display**: Color-coded badges
-
-### Object Detection
-- **Main Subjects**: Key objects in image
-- **Accurate**: Powered by Gemini Vision
-- **Multiple Objects**: Detects several items
-
-### Color Palette
-- **Dominant Colors**: Main colors in image
-- **Visual Swatches**: Color preview boxes
-- **Named Colors**: Human-readable names
-
-### Mood Analysis
-- **Atmosphere**: Overall feeling
-- **Emotion**: Detected mood
-- **Contextual**: Based on composition
-
-## Limitations
-
-- Max image size: 10MB
-- Supported formats: JPG, PNG, WebP, GIF
-- Analysis time: 2-4 seconds
-- English captions primarily
-
-## Next Steps
-
-- [ ] Add MongoDB storage for image library
-- [ ] Batch upload multiple images
-- [ ] Export captions as CSV
-- [ ] Multi-language captions
-- [ ] Image enhancement suggestions
-- [ ] Deploy to Vercel
-
----
-
-**Ready to use!** 🚀  
-Open http://localhost:3002 and start generating captions!
+English and Bahasa Indonesia. Changing language clears stale results so new analysis always matches selected language.

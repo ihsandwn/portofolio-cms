@@ -11,10 +11,9 @@ interface Message {
 interface ChatInterfaceProps {
     documentId: string;
     language?: 'en' | 'id';
-    documentText: string;
 }
 
-export default function ChatInterface({ documentId, language = 'en', documentText }: ChatInterfaceProps) {
+export default function ChatInterface({ documentId, language = 'en' }: ChatInterfaceProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -42,10 +41,8 @@ export default function ChatInterface({ documentId, language = 'en', documentTex
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    documentId, // Still sending ID for logging/reference if needed, though backend uses text
-                    documentText, // Send full text for stateless processing
+                    documentId,
                     question: input,
-                    history: messages,
                     language,
                 }),
             });
@@ -148,6 +145,7 @@ export default function ChatInterface({ documentId, language = 'en', documentTex
             {/* Input Form */}
             <form onSubmit={handleSubmit} className="flex gap-2">
                 <input
+                    aria-label="Question about document"
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}

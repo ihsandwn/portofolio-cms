@@ -1,137 +1,59 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, Image as ImageIcon, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Upload, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import type { CaptionResponse, Language } from '@/lib/schemas';
 
 interface ImageUploaderProps {
-    onCaptionGenerated: (data: any, imageUrl: string) => void;
-    loading?: boolean;
-    setLoading?: (loading: boolean) => void;
-    language?: 'en' | 'id';
+  onCaptionGenerated: (data: CaptionResponse, imageUrl: string) => void;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
+  language: Language;
 }
 
-export default function ImageUploader({ onCaptionGenerated, loading, setLoading, language = 'en' }: ImageUploaderProps) {
-    const [uploading, setUploading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [preview, setPreview] = useState<string | null>(null);
+export default function ImageUploader({ onCaptionGenerated, loading, setLoading, language }: ImageUploaderProps) {
+  const [error, setError] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
-    const onDrop = useCallback(async (acceptedFiles: File[]) => {
-        const imageFile = acceptedFiles[0];
-        if (!imageFile) return;
+  useEffect(() => () => { if (preview?.startsWith('blob:')) URL.revokeObjectURL(preview); }, [preview]);
 
-        setError(null);
-        setUploading(true);
+  const onDrop = useCallback(async (files: File[]) => {
+    const file = files[0];
+    if (!file) return;
+    setError(null);
+    const nextPreview = URL.createObjectURL(file);
+    setPreview(nextPreview);
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('language', language);
+      const response = await fetch('/api/caption', { method: 'POST', body: formData });
+      const data: unknown = await response.json();
+      if (!response.ok) throw new Error('Unable to process image');
+      onCaptionGenerated(data as CaptionResponse, nextPreview);
+    } catch {
+      setError('Unable to process image. Try another file.');
+      setPreview(null);
+    } finally { setLoading(false); }
+  }, [language, onCaptionGenerated, setLoading]);
 
-        // Create preview
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            setPreview(e.target?.result as string);
-        };
-        reader.readAsDataURL(imageFile);
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop, accept: { 'image/jpeg': ['.jpg', '.jpeg'], 'image/png': ['.png'], 'image/webp': ['.webp'], 'image/gif': ['.gif'] },
+    multiple: false, maxSize: 10 * 1024 * 1024, disabled: loading,
+  });
 
-        try {
-            const formData = new FormData();
-            formData.append('file', imageFile);
-
-            const response = await fetch('/api/caption', {
-                method: 'POST',
-                body: formData,
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Caption generation failed');
-            }
-
-            onCaptionGenerated(data, data.imageUrl);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Upload failed');
-            setPreview(null);
-        } finally {
-            setUploading(false);
-        }
-    }, [onCaptionGenerated]);
-
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop,
-        accept: { 'image/*': ['.jpg', '.jpeg', '.png', '.webp', '.gif'] },
-        multiple: false,
-        maxSize: 10 * 1024 * 1024,
-    });
-
-    return (
-        <div className="space-y-4">
-            <div
-                {...getRootProps()}
-                className={`
-          border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all
-          ${isDragActive
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                        : 'border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400'
-                    }
-          ${uploading ? 'opacity-50 cursor-not-allowed' : ''}
-        `}
-            >
-                <input {...getInputProps()} disabled={uploading} />
-
-                <div className="flex flex-col items-center gap-3">
-                    {uploading ? (
-                        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
-                    ) : preview ? (
-                        <CheckCircle className="w-12 h-12 text-green-500" />
-                    ) : (
-                        <Upload className="w-12 h-12 text-gray-400" />
-                    )}
-
-                    <div>
-                        {uploading ? (
-                            <p className="text-gray-600 dark:text-gray-400">Analyzing image...</p>
-                        ) : preview ? (
-                            <>
-                                <p className="text-green-600 dark:text-green-400 font-medium">
-                                    Image analyzed successfully!
-                                </p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                    Upload another to analyze again
-                                </p>
-                            </>
-                        ) : isDragActive ? (
-                            <p className="text-blue-600 dark:text-blue-400">Drop image here...</p>
-                        ) : (
-                            <>
-                                <p className="text-gray-700 dark:text-gray-300 font-medium">
-                                    Drag & drop an image here
-                                </p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                    or click to browse (max 10MB)
-                                </p>
-                                <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                                    Supports: JPG, PNG, WebP, GIF
-                                </p>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {preview && (
-                <div className="relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-                    <img
-                        src={preview}
-                        alt="Preview"
-                        className="w-full h-64 object-cover"
-                    />
-                </div>
-            )}
-
-            {error && (
-                <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                    <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
-                </div>
-            )}
-        </div>
-    );
+  return <div className="space-y-4">
+    <div {...getRootProps()} role="button" tabIndex={0} aria-label="Upload image" aria-busy={loading} className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-500'} ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+      <input {...getInputProps()} />
+      <div className="flex flex-col items-center gap-3">
+        {loading ? <Loader2 className="w-12 h-12 text-blue-500 animate-spin" aria-hidden="true" /> : preview ? <CheckCircle className="w-12 h-12 text-green-500" aria-hidden="true" /> : <Upload className="w-12 h-12 text-gray-400" aria-hidden="true" />}
+        <p className="text-gray-700">{loading ? 'Analyzing image...' : preview ? 'Image analyzed successfully' : isDragActive ? 'Drop image here' : 'Drag and drop an image, or browse'}</p>
+        {!loading && <p className="text-sm text-gray-500">JPG, PNG, WebP, or GIF. Maximum 10MB.</p>}
+      </div>
+    </div>
+    {preview && <img src={preview} alt="Uploaded image preview" className="w-full h-64 object-cover rounded-xl border" />}
+    {error && <div role="alert" className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg"><AlertCircle className="w-5 h-5 text-red-500" aria-hidden="true" /><p className="text-sm text-red-700">{error}</p></div>}
+  </div>;
 }
