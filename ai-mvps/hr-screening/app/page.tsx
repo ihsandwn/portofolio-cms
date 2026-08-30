@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, FileText, Target, TrendingUp } from 'lucide-react';
+import { FileText, Target, TrendingUp } from 'lucide-react';
+import type { ScreeningApiResponse } from '@/lib/schemas';
 import ResumeUploader from '@/components/ResumeUploader';
 import JobDescriptionInput from '@/components/JobDescriptionInput';
 import ScreeningResults from '@/components/ScreeningResults';
@@ -11,14 +12,14 @@ export type Language = 'en' | 'id';
 
 export default function Home() {
   const [jobDescription, setJobDescription] = useState('');
-  const [screeningResult, setScreeningResult] = useState<any | null>(null);
+  const [screeningResult, setScreeningResult] = useState<ScreeningApiResponse | null>(null);
   const [language, setLanguage] = useState<Language>('en');
 
   const handleJobDescriptionChange = (jd: string) => {
     setJobDescription(jd);
   };
 
-  const handleScreeningComplete = (result: any) => {
+  const handleScreeningComplete = (result: ScreeningApiResponse) => {
     setScreeningResult(result);
   };
 
@@ -48,7 +49,7 @@ export default function Home() {
           {/* JD Input */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-4">
-              <Target className="w-5 h-5 text-blue-500" />
+              <Target aria-hidden="true" className="w-5 h-5 text-blue-500" />
               <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                 {language === 'en' ? 'Job Description' : 'Deskripsi Pekerjaan'}
               </h2>
@@ -59,7 +60,7 @@ export default function Home() {
           {/* Resume Upload */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-4">
-              <FileText className="w-5 h-5 text-blue-600" />
+              <FileText aria-hidden="true" className="w-5 h-5 text-blue-600" />
               <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                 {language === 'en' ? 'Upload Resume' : 'Unggah Resume'}
               </h2>

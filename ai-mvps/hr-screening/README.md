@@ -22,6 +22,17 @@ AI-powered resume screening and job description matching using Gemini AI semanti
 - **Gemini 2.5-Flash** - AI semantic matching
 - **pdf2json** - PDF resume parsing
 - **React Dropzone** - File upload
+- **Zod** - Strict request and AI response validation
+
+## Security hardening
+
+- Laravel access token revalidated server-side before auth cookie issuance and on every `POST /api/screen` request.
+- `POST /api/screen` uses an in-memory per-IP-and-token limiter: 10 requests per 10 minutes.
+- PDF uploads require `%PDF-` magic bytes, `.pdf` filename, 10MB maximum, and extracted-text limits.
+- Resume and job description content is delimited as untrusted input; prompt instructions inside either input are ignored.
+- Generic client errors avoid exposing parser, provider, or infrastructure details.
+
+The rate limiter is a baseline only. In serverless deployments, memory is local to each warm instance and is lost on cold starts, so it cannot enforce a global limit. Use a shared store or edge/provider rate limiter for production-wide enforcement.
 
 ## Getting Started
 
@@ -39,6 +50,15 @@ Open [http://localhost:3003](http://localhost:3003)
 - **Step 2**: Upload PDF resume (drag & drop or browse)
 - **Step 3**: View AI screening results with scores
 
+## Development Checks
+
+```bash
+npm run test         # Node built-in tests for schemas, PDF signature, limiter
+npm run lint         # ESLint
+npm run typecheck    # tsc --noEmit
+npm run build        # Production build
+```
+
 ## Project Structure
 
 ```
@@ -54,8 +74,11 @@ hr-screening/
 │   ├── ResumeUploader.tsx      # PDF upload with drag-drop
 │   └── ScreeningResults.tsx    # Results visualization
 ├── lib/
+│   ├── auth.ts                 # Laravel token validation
 │   ├── gemini-hr.ts            # Gemini AI HR client
-│   └── resume-parser.ts        # PDF text extraction
+│   ├── rate-limit.ts           # In-memory baseline limiter
+│   ├── resume-parser.ts        # PDF text extraction and signature check
+│   └── schemas.ts              # Zod schemas and exported TS types
 └── .env.local                  # Environment variables
 ```
 
@@ -157,11 +180,11 @@ Preferred:
 
 ## Limitations
 
-- PDF resumes only (max 10MB)
-- English language primarily
-- ~1500 tokens per resume analysis
-- Analysis time: 3-5 seconds
-- Accuracy: ~85%
+- PDF resumes only (max 10MB; must contain a valid PDF signature)
+- Job descriptions limited to 20,000 characters; extracted resume text limited to 50,000 characters
+- English and Indonesian UI/analysis support
+- Rate limiting is process-local; serverless production needs a shared rate-limit store
+- AI output is assistive, must not be sole basis for hiring decisions
 
 ## Use Cases
 
@@ -183,7 +206,7 @@ This MVP is designed for the **Elabram Systems (Concept)** portfolio entry:
 
 ## Next Steps
 
-- [ ] Add MongoDB storage for screening history
+- [ ] Add screening history persistence (needs shared cloud storage, not process-local DB)
 - [ ] Implement batch resume processing
 - [ ] Add candidate ranking dashboard
 - [ ] Export screening reports as PDF

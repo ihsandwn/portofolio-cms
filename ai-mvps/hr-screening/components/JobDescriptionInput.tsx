@@ -62,7 +62,13 @@ Diutamakan:
 
     return (
         <div className="space-y-4">
+            <label htmlFor="job-description" className="sr-only">
+                {language === 'en' ? 'Job description' : 'Deskripsi pekerjaan'}
+            </label>
             <textarea
+                id="job-description"
+                aria-describedby="job-description-count"
+                maxLength={20000}
                 value={jd}
                 onChange={(e) => handleChange(e.target.value)}
                 placeholder={placeholderText}
@@ -70,8 +76,8 @@ Diutamakan:
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
             />
 
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-                {jd.length} {charactersText}
+            <div id="job-description-count" className="text-sm text-gray-500 dark:text-gray-400" aria-live="polite">
+                {jd.length} / 20000 {charactersText}
             </div>
 
             {!jd && (

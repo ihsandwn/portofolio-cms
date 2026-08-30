@@ -18,9 +18,11 @@ export default function LanguageToggle({ onLanguageChange }: LanguageToggleProps
         onLanguageChange?.(newLang);
     };
 
-    return (
+return (
         <button
             onClick={handleToggle}
+            aria-pressed={language === 'en'}
+            aria-label={language === 'en' ? 'Switch to Indonesian' : 'Beralih ke Bahasa Inggris'}
             className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm"
             title={language === 'en' ? 'Switch to Indonesian' : 'Beralih ke Bahasa Inggris'}
         >

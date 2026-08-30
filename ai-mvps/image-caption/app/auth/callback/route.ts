@@ -1,34 +1,23 @@
-
 import { NextRequest, NextResponse } from 'next/server';
+import { validateToken } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
-    const searchParams = request.nextUrl.searchParams;
-    const token = searchParams.get('token');
-    const email = searchParams.get('email');
+  const token = request.nextUrl.searchParams.get('token');
+  if (!token) return NextResponse.json({ error: 'Invalid access request' }, { status: 400 });
 
-    if (!token) {
-        return NextResponse.json({ error: 'Missing token' }, { status: 400 });
-    }
+  try {
+    await validateToken(token);
+  } catch {
+    return NextResponse.json({ error: 'Invalid access request' }, { status: 401 });
+  }
 
-    // Redirect to home
-    const response = NextResponse.redirect(new URL('/', request.url));
-
-    // Set cookie valid for 10 minutes
-    response.cookies.set('mvp-access-image-caption', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 600
-    });
-
-    if (email) {
-        response.cookies.set('mvp-user-email', email, {
-            httpOnly: false,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 600
-        });
-    }
-
-    return response;
+  const response = NextResponse.redirect(new URL('/', request.url));
+  response.cookies.set('mvp-access-image-caption', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 600,
+    path: '/',
+  });
+  return response;
 }

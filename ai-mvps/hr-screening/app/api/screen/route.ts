@@ -1,68 +1,76 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { screenResume } from '@/lib/gemini-hr';
-import { parseResume } from '@/lib/resume-parser';
+import { getClientIp, validateAccessToken } from '@/lib/auth';
+import { screenRateLimiter } from '@/lib/rate-limit';
+import { hasPdfMagicBytes, parseResume } from '@/lib/resume-parser';
+import { requestFieldsSchema, screeningResultSchema } from '@/lib/schemas';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const MAX_RESUME_TEXT_LENGTH = 50_000;
+
+function errorResponse(error: string, status: number) {
+    return NextResponse.json({ error }, { status });
+}
 
 export async function POST(request: NextRequest) {
-    console.log('[SCREEN] Request received');
+    const token = request.cookies.get('mvp-access-hr-screening')?.value;
+    if (!token || !(await validateAccessToken(token))) {
+        return errorResponse('Unauthorized', 401);
+    }
+
+    const rateLimit = screenRateLimiter.consume(`${getClientIp(request.headers)}:${token}`);
+    if (!rateLimit.allowed) {
+        return NextResponse.json(
+            { error: 'Too many requests. Please try again later.' },
+            { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfterSeconds) } }
+        );
+    }
 
     try {
         const formData = await request.formData();
-        const file = formData.get('file') as File;
-        const jobDescription = formData.get('jobDescription') as string;
-        const languageParam = (formData.get('language') as string) || 'en';
-        const language: 'en' | 'id' = languageParam === 'id' ? 'id' : 'en';
+        const fields = requestFieldsSchema.safeParse({
+            jobDescription: formData.get('jobDescription'),
+            language: formData.get('language') ?? 'en',
+        });
+        const file = formData.get('file');
 
-        if (!file) {
-            return NextResponse.json({ error: 'No resume provided' }, { status: 400 });
+        if (!fields.success || !(file instanceof File)) {
+            return errorResponse('Invalid screening request.', 400);
         }
 
-        if (!jobDescription || jobDescription.trim().length === 0) {
-            return NextResponse.json({ error: 'Job description is required' }, { status: 400 });
+        if (file.size === 0 || file.size > MAX_FILE_SIZE || file.name.length > 255) {
+            return errorResponse('Invalid resume file.', 400);
         }
 
-        // Validate file type
-        if (file.type !== 'application/pdf') {
-            return NextResponse.json({ error: 'Only PDF resumes are allowed' }, { status: 400 });
+        const buffer = Buffer.from(await file.arrayBuffer());
+        if (!hasPdfMagicBytes(buffer)) {
+            return errorResponse('Invalid resume file.', 400);
         }
 
-        // Validate file size
-        if (file.size > MAX_FILE_SIZE) {
-            return NextResponse.json({ error: 'Resume too large (max 10MB)' }, { status: 400 });
+        const resumeText = (await parseResume(buffer)).trim();
+        if (resumeText.length < 50 || resumeText.length > MAX_RESUME_TEXT_LENGTH) {
+            return errorResponse('Resume could not be processed.', 400);
         }
 
-        console.log('[SCREEN] Processing resume:', file.name, 'Language:', language);
-
-        // Parse PDF
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const resumeText = await parseResume(buffer);
-
-        if (!resumeText || resumeText.length < 50) {
-            return NextResponse.json({ error: 'Resume appears to be empty or unreadable' }, { status: 400 });
+        const screening = screeningResultSchema.safeParse(
+            await screenResume(resumeText, fields.data.jobDescription, fields.data.language)
+        );
+        if (!screening.success) {
+            console.error('[SCREEN] Invalid AI response', screening.error.flatten());
+            return errorResponse('Screening could not be completed.', 502);
         }
-
-        console.log('[SCREEN] Resume parsed, screening with AI...');
-
-        // Screen with AI
-        const screening = await screenResume(resumeText, jobDescription, language);
-        console.log('[SCREEN] Screening complete');
 
         return NextResponse.json({
             success: true,
             filename: file.name,
-            ...screening,
+            ...screening.data,
             screenedAt: new Date().toISOString(),
         });
     } catch (error) {
-        console.error('[SCREEN] Error:', error);
-        return NextResponse.json(
-            { error: error instanceof Error ? error.message : 'Screening failed' },
-            { status: 500 }
-        );
+        console.error('[SCREEN] Request failed', error);
+        return errorResponse('Screening could not be completed.', 500);
     }
 }

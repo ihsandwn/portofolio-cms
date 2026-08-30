@@ -5,7 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import { Upload, File, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 interface PDFUploaderProps {
-    onUploadSuccess: (documentId: string, filename: string, text: string) => void;
+    onUploadSuccess: (documentId: string, filename: string) => void;
 }
 
 export default function PDFUploader({ onUploadSuccess }: PDFUploaderProps) {
@@ -36,7 +36,7 @@ export default function PDFUploader({ onUploadSuccess }: PDFUploaderProps) {
                 throw new Error(data.error || 'Upload failed');
             }
 
-            onUploadSuccess(data.document.id, data.document.filename, data.document.text);
+            onUploadSuccess(data.document.id, data.document.filename);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Upload failed');
             setFile(null);
@@ -65,9 +65,9 @@ export default function PDFUploader({ onUploadSuccess }: PDFUploaderProps) {
           ${uploading ? 'opacity-50 cursor-not-allowed' : ''}
         `}
             >
-                <input {...getInputProps()} disabled={uploading} />
+                <input {...getInputProps()} disabled={uploading} aria-label="Choose PDF document" />
 
-                <div className="flex flex-col items-center gap-3">
+                <div className="flex flex-col items-center gap-3" aria-live="polite">
                     {uploading ? (
                         <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
                     ) : file ? (

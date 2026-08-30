@@ -1,146 +1,59 @@
-# Sentiment Analyzer - MVP 2
+# Sentiment Analyzer
 
-AI-powered sentiment analysis tool using Google Gemini AI to detect emotions and sentiment in text.
+Next.js sentiment analyzer backed by Gemini. Supports English and Indonesian UI/output explanations.
 
-## Features
+## Setup
 
-✅ **Text Analysis** - Analyze sentiment (Positive, Negative, Neutral)  
-✅ **Emotion Detection** - Identify joy, sadness, anger, fear, surprise  
-✅ **Confidence Scores** - See how confident the AI is about each emotion  
-✅ **Real-time Results** - Get instant analysis with beautiful visualizations  
-✅ **Example Texts** - Quick start with pre-written examples  
-✅ **Dark Blue Theme** - Matches Laravel CMS color scheme
+Create `.env.local`:
 
-## Tech Stack
+```env
+GEMINI_API_KEY=your_gemini_key
+GEMINI_MODEL=gemini-2.5-flash
+LARAVEL_API_URL=http://localhost:8000
+```
 
-- **Next.js** - React framework
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **Gemini 2.5-Flash** - AI sentiment analysis
-- **Recharts** - Data visualization (optional)
-- **Lucide React** - Icons
-
-## Getting Started
-
-### 1. Start Development Server
+Start Laravel CMS, open its AI Lab, and enter this app through Laravel's generated callback. The callback validates its 64-character access token against Laravel before setting a 10-minute HTTP-only cookie.
 
 ```bash
+npm install
 npm run dev
 ```
 
-Open [http://localhost:3001](http://localhost:3001)
+Open `http://localhost:3001` through Laravel AI Lab access.
 
-### 2. Analyze Text
+## Commands
 
-- Enter text in the textarea (up to 5000 characters)
-- Or click an example to try it out
-- Click "Analyze Sentiment"
-- View results with sentiment, confidence, and emotions
-
-## Environment Variables
-
-Already configured in `.env.local`:
-
-- `GEMINI_API_KEY` - Google Gemini API key
-- `GEMINI_MODEL` - gemini-2.5-flash
-- `MONGODB_URI` - MongoDB connection (for future features)
-- `NEXT_PUBLIC_APP_URL` - http://localhost:3001
-
-## Project Structure
-
-```
-sentiment-analyzer/
-├── app/
-│   ├── api/
-│   │   ├── analyze/route.ts    # Sentiment analysis endpoint
-│   │   └── health/route.ts     # Health check
-│   ├── layout.tsx              # Root layout
-│   └── page.tsx                # Main page
-├── components/
-│   ├── TextInput.tsx           # Text input with examples
-│   └── ResultsDashboard.tsx    # Results visualization
-├── lib/
-│   └── gemini.ts               # Gemini AI client
-└── .env.local                  # Environment variables
+```bash
+npm test
+npm run lint
+npm run typecheck
+npm run build
 ```
 
-## API Endpoints
+## API
 
-### POST /api/analyze
-Analyze text sentiment and detect emotions.
+`POST /api/analyze` requires a validated access cookie and same-origin browser request.
 
-**Request:**
 ```json
 {
-  "text": "I love this product!"
+  "text": "I love this product.",
+  "language": "en"
 }
 ```
 
-**Response:**
-```json
-{
-  "success": true,
-  "sentiment": "Positive",
-  "confidence": 95,
-  "emotions": {
-    "joy": 85,
-    "sadness": 5,
-    "anger": 2,
-    "fear": 3,
-    "surprise": 5
-  },
-  "explanation": "Text expresses strong positive emotion...",
-  "analyzedAt": "2026-01-31T..."
-}
-```
+Response fields are schema-validated: `sentiment`, `confidence`, `emotions`, `explanation`, and `analyzedAt`.
 
-### GET /api/health
-Health check endpoint.
+## Security
 
-## How It Works
+- Laravel callback token validation before cookie creation and API usage
+- HTTP-only, same-site access cookie
+- Same-origin API enforcement
+- In-memory limit: 10 requests per IP/token per 10 minutes
+- Zod validation at request, Gemini response, and client response boundaries
+- Gemini JSON-only output with untrusted input boundaries
+- Generic server errors without provider details
+- CSP, clickjacking, MIME-sniffing, referrer, and permissions headers
 
-1. **Input**: User enters text (up to 5000 characters)
-2. **API Call**: Text sent to `/api/analyze` endpoint
-3. **Gemini AI**: Gemini analyzes sentiment and emotions
-4. **JSON Parsing**: Extract structured data from AI response
-5. **Visualization**: Display results with progress bars and icons
+## Limits
 
-## Features in Detail
-
-### Sentiment Detection
-- **Positive**: Happy, excited, satisfied
-- **Negative**: Angry, sad, disappointed
-- **Neutral**: Factual, informational
-
-### Emotion Analysis
-- **Joy**: Happiness, excitement
-- **Sadness**: Disappointment, grief
-- **Anger**: Frustration, rage
-- **Fear**: Worry, anxiety
-- **Surprise**: Shock, amazement
-
-## Example Texts
-
-1. **Positive**: "I absolutely love this product! It's amazing..."
-2. **Negative**: "This is terrible. Worst experience ever..."
-3. **Neutral**: "The weather is nice today. Going to the park."
-
-## Limitations
-
-- Max text length: 5000 characters
-- Supports English primarily
-- Emotions scored 0-100%
-- Analysis time: 1-3 seconds
-
-## Next Steps
-
-- [ ] Add MongoDB storage for analysis history
-- [ ] Implement batch text analysis
-- [ ] Export results as PDF/CSV
-- [ ] Multi-language support
-- [ ] Deploy to Vercel
-
----
-
-**Ready to use!** 🚀  
-Open http://localhost:3001 and start analyzing sentiment!
+Text input is limited to 5,000 characters. The in-memory rate limiter resets on deployment or process restart.
