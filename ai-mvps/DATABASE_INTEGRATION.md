@@ -1,126 +1,25 @@
-# Database Integration for AI Products
+# AI Products - Knowledge Base
 
-## Overview
+While the MVP apps are hardened and self-contained, keep secrets out of this repository. See each MVP's README for setup, security, and limits.
 
-All 4 AI products support both **stateless local development** and **persistent production storage** through environment-based switching.
+## Requirements (all MVP apps)
 
-## Architecture
+- `.env.local` contains real secrets and is gitignored. Never commit it.
+- API keys, Mongo/Supabase connection strings, tokens, cookies, private keys and URLs containing secrets must never be committed.
+- Rate limiting is process-local and resets on deploy; use a shared store (Redis/Upstash) for horizontally scaled production.
+- PDF RAG embeddings are in-memory; use pgvector/vector DB for persistent production RAG.
 
-### Local Development (Default)
-```
-NODE_ENV=development (or unset)
-├─ ✅ Stateless - no database needed
-├─ ✅ Fast iteration
-├─ ✅ Zero setup
-└─ ✅ Data lives in memory only
-```
+## Production storage (planned / optional)
 
-### Production
-```
-NODE_ENV=production
-├─ ✅ Supabase (PostgreSQL)
-│   ├─ User authentication
-│   ├─ Structured metadata
-│   ├─ Query history  
-│   └─ Analytics data
-└─ ✅ MongoDB Atlas
-    ├─ Full document storage
-    ├─ Vector embeddings
-    ├─ Unstructured data
-    └─ Large text chunks
-```
+Storage is intentionally not wired into the MVP apps (stateless baseline). If you add persistence, follow these schemas per product, enforce row-level ownership, retention, and deletion:
 
-## Usage
+| Product | Suggested storage | Document/row | Purpose |
+| --- | --- | --- | --- |
+| PDF RAG Chatbot | pgvector / MongoDB | `pdf_documents`, `vectors`, `chat_history` | Chunks + embeddings + chat |
+| Sentiment Analyzer | PostgreSQL / MongoDB | `sentiment_analyses` | Analysis results + metadata |
+| Image Caption | Object storage + DB | `image_captions` | Caption metadata; images in private bucket |
+| HR Screening | PostgreSQL / MongoDB | `hr_screenings`, `resumes` | Match metadata + resume text |
 
-### Shared Database Modules
-
-Located in `ai-mvps/shared/database/`:
-
-```typescript
-// Import database utilities
-import { saveToSupabase, queryFrom Supabase } from '@/shared/database';
-import { saveToMongo, queryFromMongo } from '@/shared/database';
-
-// Save data (auto-skipped in development)
-await saveToSupabase('chat_history', {
-  user_id: userId,
-  question: 'What is AI?',
-  answer: 'AI is...'
-});
-
-// Save to MongoDB (auto-skipped in development)
-await saveToMongo('pdf_documents', {
-  userId: userId,
-  fullText: pdfText,
-  vectors: embeddings
-});
-```
-
-### Environment-Based Switching
-
-The database clients automatically detect the environment:
-
-- **Development**: Returns `null` and logs a message
-- **Production**: Connects to Supabase/MongoDB and persists data
-
-No code changes needed - just set `NODE_ENV=production`!
-
-## Database Schemas
-
-See [production-deployment-guide.md](file:///C:/Users/ichsa/.gemini/antigravity/brain/cb007c0e-2b0c-443f-bf6d-9c966e5d32d5/production-deployment-guide.md) for complete schema documentation.
-
-## Setup
-
-### Local Development
-```bash
-# No setup needed! Just run:
-npm run dev
-```
-
-### Production
-```bash
-# 1. Set environment variables
-cp .env.example .env.local
-
-# 2. Add your credentials
-NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-MONGODB_URI=...
-
-# 3. Set production mode
-NODE_ENV=production
-
-# 4. Run
-npm run build
-npm start
-```
-
-## Features by MVP
-
-| Product | Supabase Tables | MongoDB Collections | Purpose |
-|---------|----------------|---------------------|---------|
-| **PDF RAG Chatbot** | `chat_history` | `pdf_documents`, `vectors` | Chat history + full PDF text + embeddings |
-| **Sentiment Analyzer** | `sentiment_analyses` | `sentiment_raw_data` | Results metadata + full text analysis |
-| **Image Caption** | `image_captions` | `image_analysis` | Caption metadata + full analysis |
-| **HR Screening** | `hr_screenings` | `resumes`, `job_descriptions` | Match metadata + full resume text |
-
-## Benefits
-
-✅ **Zero Setup for Development** - No database needed locally  
-✅ **Production Ready** - Full persistence when deployed  
-✅ **Automatic Switching** - Environment detection built-in  
-✅ **Type Safe** - Full TypeScript support  
-✅ **Scalable** - Separate DBs for each MVP  
-✅ **Cost Effective** - Free tiers available
-
-## Migration Path
-
-```
-Development (Stateless)
-    ↓
-Production Testing (Staging DB)
-    ↓
-Production (Live DB)
-```
-
-No code changes required at any step!
+Notes:
+- `NEXT_PUBLIC_*` variables are public by design but still hold service configuration; validate them and never put private data behind them.
+- Hashing/encrypting PII before AI providers and defining retention/deletion policy is recommended for regulated data.

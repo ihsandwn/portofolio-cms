@@ -35,7 +35,7 @@ Required env (in `.env.local`):
 ```
 GEMINI_API_KEY=...
 GEMINI_MODEL=gemini-2.5-flash
-GEMINI_EMBEDDING_MODEL=embedding-001
+GEMINI_EMBEDDING_MODEL=text-embedding-004
 LARAVEL_API_URL=http://localhost:8000
 NEXT_PUBLIC_LARAVEL_API_URL=http://localhost:8000
 # optional override
