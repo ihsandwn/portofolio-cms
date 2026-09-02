@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { sentimentResultSchema, Language } from './schemas';
+import { DEFAULT_GEMINI_MODEL } from './gemini-config';
 
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
@@ -8,7 +9,7 @@ if (!apiKey) {
 
 const genAI = new GoogleGenerativeAI(apiKey);
 export const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+    model: process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL,
     generationConfig: {
         responseMimeType: 'application/json',
     },

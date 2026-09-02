@@ -1,11 +1,12 @@
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { CaptionSchema, type Caption } from '@/lib/schemas';
+import { DEFAULT_GEMINI_MODEL } from '@/lib/gemini-config';
 
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) throw new Error('GEMINI_API_KEY is not configured');
 
 const model = new GoogleGenerativeAI(apiKey).getGenerativeModel({
-  model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+  model: process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL,
   generationConfig: {
     responseMimeType: 'application/json',
     responseSchema: {

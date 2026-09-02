@@ -4,7 +4,7 @@ import { validateAccessToken } from '@/lib/auth';
 export async function GET(request: NextRequest) {
     const token = request.nextUrl.searchParams.get('token');
 
-    if (!token || !(await validateAccessToken(token))) {
+    if (!token || !(await validateAccessToken(token, request.nextUrl.origin))) {
         return NextResponse.json({ error: 'Invalid or expired access token.' }, { status: 401 });
     }
 

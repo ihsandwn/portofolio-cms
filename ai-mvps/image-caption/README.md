@@ -16,11 +16,9 @@ GEMINI_API_KEY=your_key
 GEMINI_MODEL=gemini-2.5-flash
 LARAVEL_API_URL=http://localhost:8000
 NEXT_PUBLIC_LARAVEL_API_URL=http://localhost:8000
-# Optional complete verification endpoint override:
-# LARAVEL_TOKEN_VERIFY_URL=http://localhost:8000/api/validate-token
 ```
 
-Laravel sends users to `/auth/callback?token=...`. Callback verifies token server-side before setting a 10-minute `HttpOnly`, `SameSite=Lax` cookie. Middleware revalidates protected page and caption requests with Laravel. `/api/health` remains public.
+Users request temporary access from Laravel AI Lab without logging in. Laravel sends approved users to `/auth/callback?token=...`. Callback verifies the token server-side before setting a 10-minute `HttpOnly`, `SameSite=Lax` cookie. Middleware checks the cookie format, and the caption API revalidates the token with Laravel before processing an image. `/api/health` remains public. Set `GEMINI_MODEL` to another supported model to roll back without changing code.
 
 ## Security
 

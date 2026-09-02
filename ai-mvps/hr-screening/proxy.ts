@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 const ACCESS_TOKEN_PATTERN = /^[A-Za-z0-9]{64}$/;
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     if (

@@ -4,10 +4,10 @@
     'image' => null,
 ])
 @php
-    $siteName = 'Ichsan Dwi Nugraha';
+    $siteName = 'Fraternity7th';
     $siteTitle = $title ? $title . ' — ' . $siteName : __('Senior Full-Stack Developer') . ' — ' . $siteName;
     $siteDescription = $description ?? __('Site Description');
-    $siteImage = $image ?? asset('favicon.png');
+    $siteImage = $image ?? asset('profile.jpg');
     $canonicalUrl = url()->current();
     $jsonLd = [
         '@context' => 'https://schema.org',
@@ -63,7 +63,7 @@
 
     <title>{{ $siteTitle }}</title>
 
-    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('profile.jpg') }}" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">

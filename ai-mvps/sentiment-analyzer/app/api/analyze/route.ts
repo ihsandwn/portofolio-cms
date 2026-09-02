@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     const token = request.cookies.get('mvp-access-sentiment')?.value;
-    if (!token || !(await validateAccessToken(token))) {
+    if (!token || !(await validateAccessToken(token, request.nextUrl.origin))) {
         return errorResponse('Unauthorized', 401);
     }
 

@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateImageCaption } from '@/lib/gemini-vision';
 import { LanguageSchema } from '@/lib/schemas';
 import { validateImageUpload } from '@/lib/image-validation';
+import { validateAccessToken } from '@/lib/auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
+  const token = request.cookies.get('mvp-access-image-caption')?.value;
+  if (!token || !(await validateAccessToken(token, request.nextUrl.origin))) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const formData = await request.formData();
     const fileValue = formData.get('file');

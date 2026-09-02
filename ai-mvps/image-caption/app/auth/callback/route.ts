@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateToken } from '@/lib/auth';
+import { validateAccessToken } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get('token');
   if (!token) return NextResponse.json({ error: 'Invalid access request' }, { status: 400 });
 
-  try {
-    await validateToken(token);
-  } catch {
+  if (!(await validateAccessToken(token, request.nextUrl.origin))) {
     return NextResponse.json({ error: 'Invalid access request' }, { status: 401 });
   }
 
