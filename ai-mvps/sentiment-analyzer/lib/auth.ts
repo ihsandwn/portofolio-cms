@@ -15,7 +15,25 @@ function laravelBaseUrl(): string | null {
     }
 }
 
-export async function validateAccessToken(token: string): Promise<boolean> {
+export function isExpectedCallbackRedirect(
+    location: string | null,
+    baseUrl: string,
+    expectedOrigin: string,
+    token: string
+): boolean {
+    if (!location) return false;
+
+    try {
+        const redirectUrl = new URL(location, baseUrl);
+        return redirectUrl.origin === expectedOrigin
+            && redirectUrl.pathname === '/auth/callback'
+            && redirectUrl.searchParams.get('token') === token;
+    } catch {
+        return false;
+    }
+}
+
+export async function validateAccessToken(token: string, expectedOrigin: string): Promise<boolean> {
     if (!accessTokenSchema.safeParse(token).success) return false;
 
     const baseUrl = laravelBaseUrl();
@@ -29,14 +47,9 @@ export async function validateAccessToken(token: string): Promise<boolean> {
             signal: AbortSignal.timeout(5000),
         });
 
-        if (response.status < 300 || response.status >= 400) return false;
-
-        const location = response.headers.get('location');
-        if (!location) return false;
-
-        const redirectUrl = new URL(location, baseUrl);
-        return redirectUrl.pathname === '/auth/callback'
-            && redirectUrl.searchParams.get('token') === token;
+        return response.status >= 300
+            && response.status < 400
+            && isExpectedCallbackRedirect(response.headers.get('location'), baseUrl, expectedOrigin, token);
     } catch {
         return false;
     }

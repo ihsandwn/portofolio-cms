@@ -3,7 +3,8 @@ import test from 'node:test';
 import { analyzeRequestSchema, sentimentResultSchema, languageSchema } from '../lib/schemas.ts';
 import { createRateLimiter } from '../lib/rate-limit.ts';
 import { isAllowedOrigin } from '../lib/origin.ts';
-import { accessTokenSchema } from '../lib/auth.ts';
+import { accessTokenSchema, isExpectedCallbackRedirect } from '../lib/auth.ts';
+import { DEFAULT_GEMINI_MODEL } from '../lib/gemini-config.ts';
 
 test('request schema enforces language and text limits', () => {
     assert.equal(analyzeRequestSchema.safeParse({ text: 'x', language: 'fr' }).success, false);
@@ -51,4 +52,15 @@ test('access token requires 64 alphanumeric characters', () => {
     assert.equal(accessTokenSchema.safeParse('a'.repeat(64)).success, true);
     assert.equal(accessTokenSchema.safeParse('short').success, false);
     assert.equal(accessTokenSchema.safeParse(`${'a'.repeat(63)}-`).success, false);
+});
+
+test('accepts only same-origin callback redirects for the same token', () => {
+    const token = 'a'.repeat(64);
+    assert.equal(isExpectedCallbackRedirect(`https://sentiment.example/auth/callback?token=${token}`, 'https://cms.test', 'https://sentiment.example', token), true);
+    assert.equal(isExpectedCallbackRedirect(`https://image.example/auth/callback?token=${token}`, 'https://cms.test', 'https://sentiment.example', token), false);
+    assert.equal(isExpectedCallbackRedirect('https://sentiment.example/auth/callback?token=other', 'https://cms.test', 'https://sentiment.example', token), false);
+});
+
+test('uses Gemini 2.5 Flash as default model', () => {
+    assert.equal(DEFAULT_GEMINI_MODEL, 'gemini-2.5-flash');
 });

@@ -10,9 +10,10 @@ Create `.env.local`:
 GEMINI_API_KEY=your_gemini_key
 GEMINI_MODEL=gemini-2.5-flash
 LARAVEL_API_URL=http://localhost:8000
+NEXT_PUBLIC_LARAVEL_API_URL=http://localhost:8000
 ```
 
-Start Laravel CMS, open its AI Lab, and enter this app through Laravel's generated callback. The callback validates its 64-character access token against Laravel before setting a 10-minute HTTP-only cookie.
+Request temporary access from Laravel AI Lab without logging in, then open Laravel's generated callback. The callback validates its 64-character access token against Laravel before setting a 10-minute HTTP-only cookie. Middleware checks token format, while `/api/analyze` revalidates the token with Laravel before calling Gemini. Set `GEMINI_MODEL` to another supported model to roll back without changing code.
 
 ```bash
 npm install

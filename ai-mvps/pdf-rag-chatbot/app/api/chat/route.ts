@@ -4,6 +4,7 @@ import { embedText, streamGroundedAnswer } from '@/lib/gemini';
 import { formatCitations, retrieveChunks, truncateToWords } from '@/lib/rag';
 import { RateLimiter } from '@/lib/rate-limit';
 import { getDocument } from '@/lib/storage';
+import { validateAccessToken } from '@/lib/laravel-auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,7 +18,12 @@ function clientKey(request: NextRequest): string {
 }
 
 export async function POST(request: NextRequest) {
-  if (!limiter.check(clientKey(request)).allowed) {
+  const token = request.cookies.get('mvp-access-pdf-rag')?.value;
+  if (!token || !(await validateAccessToken(token, request.nextUrl.origin))) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  if (!limiter.check(`${clientKey(request)}:${token}`).allowed) {
     return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
   }
   try {

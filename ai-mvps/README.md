@@ -28,13 +28,14 @@ Each MVP is a standalone Next.js application with:
 
 ## Integration with Laravel CMS
 
-All MVPs connect to Laravel CMS at: `http://localhost:8000/api`
+Users request temporary access from Laravel AI Lab without logging in. Laravel validates the 10-minute token through `GET /ai-lab/auth/{token}` and redirects to the selected MVP callback. Each MVP validates that redirect before creating its HTTP-only cookie, then revalidates the token before running protected AI requests.
 
-API Endpoints:
-- `GET /api/validate-token` - Validate Sanctum token
-- `POST /api/mvp/token` - Create new token
-- `DELETE /api/mvp/tokens` - Revoke tokens
-- `GET /api/mvp/health` - Health check
+Configure both server-side and public CMS origins:
+
+```env
+LARAVEL_API_URL=http://localhost:8000
+NEXT_PUBLIC_LARAVEL_API_URL=http://localhost:8000
+```
 
 ## 🚀 Vercel Deployment Guide
 
@@ -75,7 +76,9 @@ Add the following variables in the "Environment Variables" section:
 | Variable | Value |
 | :--- | :--- |
 | `GEMINI_API_KEY` | Your Gemini API Key (copy from local `.env`) |
-| `NEXT_PUBLIC_LARAVEL_API_URL` | **Your Production CMS URL** (e.g., `https://your-portfolio.com`) **NOT localhost** |
+| `GEMINI_MODEL` | `gemini-2.5-flash`, or another supported model for rollback |
+| `LARAVEL_API_URL` | **Your Production CMS URL** (e.g., `https://your-portfolio.com`) **NOT localhost** |
+| `NEXT_PUBLIC_LARAVEL_API_URL` | Same production CMS URL, used for browser redirects |
 
 #### 3. Deploy
 Click **Deploy**. Vercel will build the app.

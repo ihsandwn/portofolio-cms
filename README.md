@@ -95,4 +95,4 @@ For detailed instructions on deploying to Staging or Production environments, pl
 
 ---
 
-**Built with ❤️ by Ichsan Dwi Nugraha**
+**Built with passion by fraternity7th**
