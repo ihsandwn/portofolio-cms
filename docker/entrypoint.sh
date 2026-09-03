@@ -16,6 +16,12 @@ if [ "$role" = "app" ]; then
         php artisan migrate --force
     fi
 
+    # Livewire serves its own JS from a versioned PHP route. A leftover
+    # public/vendor/livewire folder makes it emit a static <script src> that
+    # 404s on any stale deploy, which silently kills every wire:click.
+    echo "Removing any published Livewire assets..."
+    php artisan livewire:unpublish --force
+
     # Caching configuration
     echo "Caching configuration..."
     php artisan config:cache

@@ -41,3 +41,43 @@ Artisan::command('dev:csp-check {--path=/ : Request path (use --path=/about; avo
 
     return Command::SUCCESS;
 })->purpose('Runtime check: does Laravel set Content-Security-Policy on a response?');
+
+Artisan::command('livewire:unpublish {--force : Delete without confirmation}', function () {
+    $dir = public_path('vendor/livewire');
+
+    if (! is_dir($dir)) {
+        $this->info('No published Livewire assets found. Nothing to do.');
+
+        return Command::SUCCESS;
+    }
+
+    if (! $this->option('force') && ! $this->confirm("Delete published Livewire assets in {$dir}?", true)) {
+        $this->line('Aborted.');
+
+        return Command::SUCCESS;
+    }
+
+    $failed = [];
+
+    foreach ((array) glob($dir.'/*') as $file) {
+        if (is_file($file) && ! @unlink($file)) {
+            $failed[] = $file;
+        }
+    }
+
+    @rmdir($dir);
+    @rmdir(public_path('vendor'));
+
+    if (is_dir($dir)) {
+        $this->error("Could not fully remove {$dir}. Check filesystem ownership/permissions.");
+        foreach ($failed as $file) {
+            $this->line('  still present: '.$file);
+        }
+
+        return Command::FAILURE;
+    }
+
+    $this->info('Removed published Livewire assets. Livewire will now serve its JS from the versioned PHP route.');
+
+    return Command::SUCCESS;
+})->purpose('Remove stale public/vendor/livewire assets so Livewire serves JS from its own route');

@@ -49,11 +49,37 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 
 ### 4. Post-Deployment Steps
 
-The `entrypoint.sh` script automatically runs `config:cache` and `view:cache`.
+The `entrypoint.sh` script automatically runs `livewire:unpublish`, `config:cache`,
+`route:cache` and `view:cache`.
 Run database migrations manually or via exec to be safe:
 
 ```bash
 docker-compose exec app php artisan migrate --force
+```
+
+### 5. Livewire JavaScript — do not publish it
+
+Livewire serves its own JS from a PHP route derived from `APP_KEY`
+(`/livewire-<hash>/livewire.min.js`). Leave it that way.
+
+If `public/vendor/livewire/` exists, Livewire emits a static
+`<script src="/vendor/livewire/livewire.min.js?id=...">` instead. When that
+folder is missing or stale on the server the browser gets the HTML 404 page,
+refuses to execute it, and every `wire:click` on the site stops working with no
+visible error other than a console message:
+
+```
+Refused to execute script from '.../livewire.min.js' because its MIME type
+('text/html') is not executable, and strict MIME type checking is enabled.
+```
+
+`public/vendor` is gitignored and `entrypoint.sh` runs
+`php artisan livewire:unpublish --force` on boot, so images stay clean.
+To clear it by hand:
+
+```bash
+docker-compose exec app php artisan livewire:unpublish --force
+docker-compose exec app php artisan view:clear
 ```
 
 ## 🌐 Nginx Configuration
