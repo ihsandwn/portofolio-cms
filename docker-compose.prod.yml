@@ -1,0 +1,20 @@
+services:
+  app:
+    build:
+      target: prod
+    volumes: [] # Remove dev volume mount
+    environment:
+      RUN_MIGRATIONS: "true"
+      # DB_HOST should be set in .env or CI/CD pipeline, not hardcoded here for prod usually, 
+      # but if using same host strategy:
+      # DB_HOST: host.docker.internal 
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  web:
+    volumes:
+      - ./docker/nginx/app.conf:/etc/nginx/conf.d/default.conf
+      # Remove code volume mount, keeping only config if needed. 
+      # In true prod, nginx config often baked in too, but this works for simple override.
+    ports:
+      - "80:80" # Standard HTTP port for prod
