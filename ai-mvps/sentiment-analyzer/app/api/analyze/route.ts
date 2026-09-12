@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeSentiment } from '@/lib/gemini';
-import { getClientIp, validateAccessToken } from '@/lib/auth';
+import { accessTokenSchema, getClientIp } from '@/lib/auth';
 import { analyzeRateLimiter } from '@/lib/rate-limit';
 import { isAllowedOrigin } from '@/lib/origin';
 import { analyzeRequestSchema, sentimentResultSchema } from '@/lib/schemas';
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     const token = request.cookies.get('mvp-access-sentiment')?.value;
-    if (!token || !(await validateAccessToken(token))) {
+    if (!token || !accessTokenSchema.safeParse(token).success) {
         return errorResponse('Unauthorized', 401);
     }
 
