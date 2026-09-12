@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const ACCESS_TOKEN_PATTERN = /^[A-Za-z0-9]{64}$/;
-
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
@@ -16,7 +14,7 @@ export function middleware(request: NextRequest) {
     }
 
     const token = request.cookies.get('mvp-access-hr-screening')?.value;
-    if (token && ACCESS_TOKEN_PATTERN.test(token)) {
+    if (token) {
         return NextResponse.next();
     }
 

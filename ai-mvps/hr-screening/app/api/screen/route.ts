@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { screenResume } from '@/lib/gemini-hr';
-import { getClientIp, validateAccessToken } from '@/lib/auth';
+import { accessTokenSchema, getClientIp } from '@/lib/auth';
 import { screenRateLimiter } from '@/lib/rate-limit';
 import { hasPdfMagicBytes, parseResume } from '@/lib/resume-parser';
 import { requestFieldsSchema, screeningResultSchema } from '@/lib/schemas';
@@ -17,7 +17,7 @@ function errorResponse(error: string, status: number) {
 
 export async function POST(request: NextRequest) {
     const token = request.cookies.get('mvp-access-hr-screening')?.value;
-    if (!token || !(await validateAccessToken(token))) {
+    if (!token || !accessTokenSchema.safeParse(token).success) {
         return errorResponse('Unauthorized', 401);
     }
 
