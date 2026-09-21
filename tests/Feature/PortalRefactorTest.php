@@ -74,6 +74,21 @@ class PortalRefactorTest extends TestCase
              $this->markTestSkipped('No AI portfolio found from Seeder.');
         }
     }
+
+    public function test_seeded_ai_lab_projects_show_request_access()
+    {
+        $projects = Portfolio::where('type', 'ai_agent')->get();
+
+        $this->assertNotEmpty($projects);
+
+        foreach ($projects as $project) {
+            $this->assertNotEmpty($project->url, "{$project->slug} must have an MVP URL.");
+
+            $this->get(route('ai-lab.show', $project->slug))
+                ->assertOk()
+                ->assertSee('Request Access');
+        }
+    }
     public function test_homepage_case_study_links_are_correct()
     {
         $response = $this->get('/');

@@ -26,6 +26,81 @@ Each MVP is a standalone Next.js application with:
 2. Fill in your credentials (never commit real secrets)
 3. Start development: `npm run dev`
 
+### Ports
+
+| MVP | Port | Start from |
+| :--- | :--- | :--- |
+| PDF RAG Chatbot | 3000 | `ai-mvps/pdf-rag-chatbot` |
+| Sentiment Analyzer | 3001 | `ai-mvps/sentiment-analyzer` |
+| Image Caption | 3002 | `ai-mvps/image-caption` |
+| HR Screening | 3003 | `ai-mvps/hr-screening` |
+
+### Opening an MVP on localhost
+
+Middleware gates every page on an `mvp-access-*` cookie. That cookie is normally set by
+the Laravel `/ai-lab` handoff, so hitting `http://localhost:3000` directly used to redirect
+straight back to `http://localhost:8000/ai-lab` and the UI never rendered.
+
+Two ways in:
+
+**A. Local dev flag (no Laravel needed).** Each `.env.local` carries:
+
+```
+MVP_DEV_BYPASS_AUTH=true
+MVP_SESSION_TTL_SECONDS=3600
+```
+
+With the flag on, the first request seeds a session cookie and the normal auth path runs
+from there. The flag is double-gated — it reads `process.env.NODE_ENV !== 'production'`
+as well as the flag itself, so a production build ignores it entirely. **Never set it on Vercel.**
+
+**B. Full Laravel handoff.** Run `php artisan serve` (port 8000), open `/ai-lab`, pick a
+product, request access, and follow the generated link. Laravel's token lives 10 minutes;
+the MVP session cookie lives `MVP_SESSION_TTL_SECONDS` (default 1 hour, max 24 hours).
+
+### Environment variables
+
+| Variable | Purpose |
+| :--- | :--- |
+| `GEMINI_API_KEY` | Google Gemini credential. All four MVPs need a working key. |
+| `GEMINI_MODEL` | Chat/vision model, default `gemini-2.5-flash`. |
+| `EMBEDDING_MODEL` | PDF RAG only. `gemini-embedding-001`. (`text-embedding-004` was retired and returns 404.) |
+| `NEXT_PUBLIC_LARAVEL_API_URL` | Where an unauthenticated visitor is sent. |
+| `MVP_DEV_BYPASS_AUTH` | Local only. Skips the cookie gate. Ignored in production builds. |
+| `MVP_SESSION_TTL_SECONDS` | Session cookie lifetime in seconds. Default 3600, capped at 86400. |
+
+### Testing each MVP
+
+Run the automated checks from each MVP directory:
+
+```bash
+npm run lint
+npm run typecheck
+npm test
+```
+
+Then exercise the UI in a browser with the dev server running:
+
+- **PDF RAG Chatbot** (`:3000`) — drop a PDF on the left panel (max 10MB). The panel turns
+  green with the filename, then ask a question on the right. Answers cite pages like `[p. 1]`.
+  Upload and chat share one in-process store, so both must run against the same dev server.
+- **Sentiment Analyzer** (`:3001`) — paste text, hit analyze, check the sentiment label,
+  confidence, emotion bars and explanation. Toggle EN/ID and re-run.
+- **Image Caption** (`:3002`) — drop a real JPG, PNG, WebP or GIF (max 10MB). Extension and
+  magic bytes must agree, so a JPEG renamed `.png` is rejected by design. Expect title,
+  caption, categories, objects, colours and mood.
+- **HR Screening** (`:3003`) — paste a job description, then upload a PDF resume. Expect an
+  overall score, recommendation, matched/missing skills and a summary.
+
+Health endpoints are public and need no cookie:
+
+```bash
+curl http://localhost:3000/api/health
+curl http://localhost:3001/api/health
+curl http://localhost:3002/api/health
+curl http://localhost:3003/api/health
+```
+
 ## Integration with Laravel CMS
 
 All MVPs connect to Laravel CMS at: `http://localhost:8000/api`
