@@ -24,6 +24,9 @@
                         <div class="font-medium text-on-background flex items-center flex-wrap gap-2">
                             {{ $item->title['en'] }}
                             <span class="font-label text-[10px] uppercase tracking-wider text-secondary border border-outline-variant/30 px-1.5 py-0.5">{{ __('Order') }}: {{ $item->order }}</span>
+                            <span class="font-label text-[10px] uppercase tracking-wider border px-1.5 py-0.5 {{ $item->is_active ? 'bg-primary-container/30 text-on-primary-container border-outline-variant/20' : 'bg-error-container/20 text-on-error-container border-outline-variant/20' }}">
+                                {{ $item->is_active ? __('Active') : __('Hidden') }}
+                            </span>
                         </div>
                         <div class="text-sm text-secondary">{{ $item->url }}</div>
                          @if(isset($item->title['id']) && $item->title['id'])
@@ -31,6 +34,7 @@
                         @endif
                     </div>
                     <div class="flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-blueprint">
+                        <button type="button" wire:click="toggleActive({{ $item->id }})" class="text-secondary hover:text-on-background font-label text-[10px] uppercase tracking-wider">{{ $item->is_active ? __('Hide') : __('Show') }}</button>
                         <button type="button" wire:click="edit({{ $item->id }})" class="text-primary hover:text-primary-dim font-label text-[10px] uppercase tracking-wider">{{ __('Edit') }}</button>
                         <button type="button" wire:click="delete({{ $item->id }})" class="text-error hover:opacity-80 font-label text-[10px] uppercase tracking-wider" wire:confirm="{{ __('Delete this item?') }}">{{ __('Delete') }}</button>
                     </div>
@@ -82,6 +86,15 @@
                             <div>
                                 <label class="block font-label text-[10px] font-semibold uppercase tracking-wider text-secondary mb-1">{{ __('Order') }}</label>
                                 <input type="number" wire:model="order" class="w-24 {{ $f }}">
+                            </div>
+
+                            <div>
+                                <label class="block font-label text-[10px] font-semibold uppercase tracking-wider text-secondary mb-1">{{ __('Status') }}</label>
+                                <label class="flex items-center gap-2 text-sm text-on-background">
+                                    <input type="checkbox" wire:model="isActive" class="border border-outline-variant/40 text-primary focus:ring-primary">
+                                    <span>{{ __('Show this item in the site menu') }}</span>
+                                </label>
+                                <p class="mt-1 text-xs text-outline">{{ __('An item linked to a Draft page stays hidden even when this is ticked.') }}</p>
                             </div>
                         </div>
                     </div>

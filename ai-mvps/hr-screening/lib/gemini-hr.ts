@@ -1,18 +1,15 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { screeningResultSchema } from './schemas';
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-    throw new Error('GEMINI_API_KEY is not set');
-}
+function getModel() {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 
-const genAI = new GoogleGenerativeAI(apiKey);
-export const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
-    generationConfig: {
-        responseMimeType: 'application/json',
-    },
-});
+    return new GoogleGenerativeAI(apiKey).getGenerativeModel({
+        model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+        generationConfig: { responseMimeType: 'application/json' },
+    });
+}
 
 const LANGUAGE_ID_INSTRUCTION = `
 PENTING: Berikan analisis dalam Bahasa Indonesia.
@@ -22,7 +19,6 @@ Gunakan: Tinggi, Sedang, Rendah untuk relevansi.`;
 function buildPrompt(resumeText: string, jobDescription: string, language: 'en' | 'id'): string {
     const delimiter = '---USER_INPUT_BOUNDARY_START---';
     const delimiterEnd = '---USER_INPUT_BOUNDARY_END---';
-
     const langBlock = language === 'id' ? LANGUAGE_ID_INSTRUCTION : '';
 
     return `You are an HR screening AI. Analyze the resume below against the job description and return a JSON object with the exact fields specified.
@@ -37,17 +33,9 @@ Return exactly this JSON structure:
   "recommendation": "Highly Recommended" | "Recommended" | "Maybe" | "Not Recommended",
   "matchedSkills": [<strings>],
   "missingSkills": [<strings>],
-  "experience": {
-    "years": <non-negative integer>,
-    "relevance": "High" | "Medium" | "Low"
-  },
-  "education": {
-    "level": "<string>",
-    "relevance": "High" | "Medium" | "Low"
-  },
-  "strengths": [<strings>],
-  "concerns": [<strings>],
-  "summary": "<brief string>"
+  "experience": { "years": <non-negative integer>, "relevance": "High" | "Medium" | "Low" },
+  "education": { "level": "<string>", "relevance": "High" | "Medium" | "Low" },
+  "strengths": [<strings>], "concerns": [<strings>], "summary": "<brief string>"
 }
 
 Job Description:
@@ -64,13 +52,8 @@ Respond with ONLY the JSON object. No markdown, no explanation.`;
 }
 
 export async function screenResume(resumeText: string, jobDescription: string, language: 'en' | 'id' = 'en') {
-    const prompt = buildPrompt(resumeText, jobDescription, language);
-
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
-
-    const parsed = JSON.parse(responseText);
-    const validated = screeningResultSchema.safeParse(parsed);
+    const result = await getModel().generateContent(buildPrompt(resumeText, jobDescription, language));
+    const validated = screeningResultSchema.safeParse(JSON.parse(result.response.text()));
 
     if (!validated.success) {
         console.error('[GEMINI HR] AI response validation failed', validated.error.flatten());

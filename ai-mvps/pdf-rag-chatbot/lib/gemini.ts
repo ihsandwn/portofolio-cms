@@ -1,10 +1,26 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
-const genAI = new GoogleGenerativeAI(apiKey);
-const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.5-flash' });
-const embeddingModel = genAI.getGenerativeModel({ model: process.env.GEMINI_EMBEDDING_MODEL || 'text-embedding-004' });
+function getClient(): GoogleGenerativeAI {
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY is not set');
+  }
+
+  return new GoogleGenerativeAI(apiKey);
+}
+
+function getEmbeddingModel() {
+  return getClient().getGenerativeModel({
+    model: process.env.EMBEDDING_MODEL || 'gemini-embedding-001',
+  });
+}
+
+function getChatModel() {
+  return getClient().getGenerativeModel({
+    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
+  });
+}
 
 export async function embedText(text: string): Promise<number[]> {
   const controller = new AbortController();
@@ -12,8 +28,9 @@ export async function embedText(text: string): Promise<number[]> {
     () => controller.abort(),
     Number(process.env.GEMINI_EMBED_TIMEOUT_MS ?? 15_000)
   );
+
   try {
-    const result = await embeddingModel.embedContent(text, { signal: controller.signal });
+    const result = await getEmbeddingModel().embedContent(text, { signal: controller.signal });
     return result.embedding.values;
   } finally {
     clearTimeout(timeout);
@@ -28,8 +45,9 @@ export async function streamGroundedAnswer(context: string, question: string, la
     () => controller.abort(),
     Number(process.env.GEMINI_STREAM_TIMEOUT_MS ?? 60_000)
   );
+
   try {
-    return (await model.generateContentStream(prompt, { signal: controller.signal })).stream;
+    return (await getChatModel().generateContentStream(prompt, { signal: controller.signal })).stream;
   } finally {
     clearTimeout(timeout);
   }

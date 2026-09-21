@@ -21,27 +21,20 @@ return [
         'storage/*',
     ],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
-    'allowed_origins' => [
-        'http://localhost:3000',
-        'http://localhost:3001',
-        'http://localhost:3002',
-        'http://localhost:3003',
-        'http://localhost:3004',
-        // Add Vercel preview URLs pattern (will be updated after deployment)
-        // 'https://*.vercel.app',
-    ],
+    'allowed_origins' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', (string) env('CORS_ALLOWED_ORIGINS', ''))
+    ))),
 
-    'allowed_origins_patterns' => [
-        '/\.vercel\.app$/', // Allow all Vercel preview deployments
-    ],
+    'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => ['Accept', 'Authorization', 'Content-Type', 'X-Requested-With', 'X-XSRF-TOKEN'],
 
     'exposed_headers' => [],
 
-    'max_age' => 0,
+    'max_age' => 7200,
 
     'supports_credentials' => true,
 

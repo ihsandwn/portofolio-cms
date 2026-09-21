@@ -17,6 +17,7 @@ class Builder extends Component
     public $title = [];
     public $url;
     public $order = 0;
+    public $isActive = true;
 
     protected function rules()
     {
@@ -25,6 +26,7 @@ class Builder extends Component
             'title.id' => 'nullable|string',
             'url' => 'required|string',
             'order' => 'integer',
+            'isActive' => 'boolean',
         ];
     }
 
@@ -45,6 +47,7 @@ class Builder extends Component
         $this->title = ['en' => '', 'id' => ''];
         $this->url = '';
         $this->order = 0;
+        $this->isActive = true;
         $this->showForm = true;
     }
 
@@ -54,6 +57,7 @@ class Builder extends Component
         $this->title = $item->title->getArrayCopy();
         $this->url = $item->url;
         $this->order = $item->order;
+        $this->isActive = (bool) $item->is_active;
         $this->showForm = true;
     }
 
@@ -66,6 +70,7 @@ class Builder extends Component
             'title' => $this->title,
             'url' => $this->url,
             'order' => $this->order,
+            'is_active' => $this->isActive,
         ];
 
         if ($this->editingItem) {
@@ -77,6 +82,20 @@ class Builder extends Component
         $this->showForm = false;
         $this->loadItems();
         session()->flash('success', 'Menu item saved successfully.');
+    }
+
+    /**
+     * Flip an item's visibility straight from the list, without opening the modal.
+     */
+    public function toggleActive($id)
+    {
+        $item = MenuItem::find($id);
+
+        if ($item) {
+            $item->update(['is_active' => ! $item->is_active]);
+            $this->loadItems();
+            session()->flash('success', $item->is_active ? 'Menu item activated.' : 'Menu item hidden from the site.');
+        }
     }
 
     public function delete($id)

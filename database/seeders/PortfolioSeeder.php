@@ -19,6 +19,7 @@ class PortfolioSeeder extends Seeder
                 'title' => ['en' => 'RAG Knowledge retrieval System', 'id' => 'Sistem Knowledge Retrieval RAG'],
                 'description' => ['en' => 'A retrieval-augmented generation pipeline using Solr and Vector Databases to provide accurate context for LLMs.', 'id' => 'Pipeline RAG menggunakan Solr dan Vector DB untuk konteks LLM yang akurat.'],
                 'client' => 'Internal R&D',
+                'url' => 'http://localhost:3000',
                 'type' => 'ai_agent',
                 'tech_stack' => ['Python', 'LangChain', 'Solr', 'OpenAI', 'Pinecone'],
                 'case_study' => "## Problem\nGeneric LLMs lack specific domain knowledge.\n\n## Solution\nLeveraged my experience with Solr (from SKCK Online) to build a hybrid search engine that retrieves key documents before feeding them to GPT-4.\n\n## Outcome\nReduced hallucination rates by 40% and improved answer relevance.",
@@ -30,6 +31,7 @@ class PortfolioSeeder extends Seeder
                 'title' => ['en' => 'Automated HR Screening Agent', 'id' => 'Agen Screening HR Otomatis'],
                 'description' => ['en' => 'An autonomous agent that pre-screens resumes and matches them effectively against job descriptions.', 'id' => 'Agen otonom yang melakukan screening awal resume dan mencocokkannya dengan job description.'],
                 'client' => 'Elabram Systems (Concept)',
+                'url' => 'http://localhost:3003',
                 'type' => 'ai_agent',
                 'tech_stack' => ['Laravel', 'OpenAI', 'Livewire', 'PostgreSQL'],
                 'case_study' => "## Context\nBuilding on my HRIS experience, I designed an agentic workflow to automate the initial screening phase.\n\n## Implementation\nThe system parses PDF resumes, extracts key skills, and scores them against the JD using semantic matching.\n\n## Stack\nIntegrated directly into a Laravel queue worker for background processing.",
@@ -42,6 +44,7 @@ class PortfolioSeeder extends Seeder
                 'title' => ['en' => 'Sentiment Analysis Agent (Alpha)', 'id' => 'Agen Analisis Sentimen (Alpha)'],
                 'description' => ['en' => 'Real-time sentiment analysis of customer feedback using BERT and OpenAI.', 'id' => 'Analisis sentimen umpan balik pelanggan secara real-time menggunakan BERT dan OpenAI.'],
                 'client' => 'Internal Lab',
+                'url' => 'http://localhost:3001',
                 'type' => 'ai_agent',
                 'tech_stack' => ['Python', 'BERT', 'FastAPI', 'React'],
                 'case_study' => "## Overview\nProject Alpha focuses on understanding customer emotion at scale.\n\n## Demo\nInput: 'The service was terrible but the food was great.'\nOutput: Mixed (Service: Negative, Food: Positive).",
@@ -53,6 +56,7 @@ class PortfolioSeeder extends Seeder
                 'title' => ['en' => 'PDF RAG Chatbot (Beta)', 'id' => 'Chatbot PDF RAG (Beta)'],
                 'description' => ['en' => 'Chat with your PDF documents using a retrieval-augmented generation pipeline.', 'id' => 'Ngobrol dengan dokumen PDF Anda menggunakan pipeline RAG.'],
                 'client' => 'Internal Lab',
+                'url' => 'http://localhost:3000',
                 'type' => 'ai_agent',
                 'tech_stack' => ['LangChain', 'Pinecone', 'OpenAI', 'Streamlit'],
                 'case_study' => "## Overview\nProject Beta allows users to upload manuals and ask questions.\n\n## Architecture\nUses Pinecone for vector storage and GPT-4 for answer synthesis.",
@@ -119,9 +123,12 @@ class PortfolioSeeder extends Seeder
         ];
 
         foreach ($portfolios as $portfolio) {
-            Portfolio::create(array_merge($portfolio, [
-                'slug' => Str::slug($portfolio['title']['en']),
-            ]));
+            $slug = Str::slug($portfolio['title']['en']);
+
+            Portfolio::updateOrCreate(
+                ['slug' => $slug],
+                array_merge($portfolio, ['slug' => $slug])
+            );
         }
     }
 }

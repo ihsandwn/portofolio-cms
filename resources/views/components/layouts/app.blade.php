@@ -32,6 +32,18 @@
 
         return str_starts_with($url, $base . '/') || $url === $base;
     };
+
+    // Resolved once and shared by the desktop and mobile bars: honours the menu
+    // status, each item's status, and the status of any CMS page it links to.
+    $navItems = \App\Models\Menu::navigation();
+
+    $navUrl = function (string $url): string {
+        if (str_starts_with($url, '#') && ! request()->is('/')) {
+            return url('/') . $url;
+        }
+
+        return $url;
+    };
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
@@ -95,16 +107,9 @@
                 </a>
 
                 <div class="hidden md:flex items-center gap-8">
-                    @php
-                        $menu = \App\Models\Menu::where('name', 'primary')->first();
-                        $items = $menu ? $menu->items->load('children') : collect();
-                    @endphp
-                    @foreach($items as $item)
+                    @foreach($navItems as $item)
                         @php
-                            $url = $item->url;
-                            if (str_starts_with($url, '#') && !request()->is('/')) {
-                                $url = url('/') . $url;
-                            }
+                            $url = $navUrl($item->url);
                             $useNavigate = $wireNavigate($url);
                         @endphp
                         <a href="{{ $url }}"
@@ -140,10 +145,9 @@
              x-transition:leave-end="opacity-0 -translate-y-1"
              class="md:hidden bg-surface-container-lowest border-t border-outline-variant/30">
             <div class="px-4 py-4 space-y-1">
-                @php $menu = \App\Models\Menu::where('name', 'primary')->first(); $items = $menu ? $menu->items : collect(); @endphp
-                @foreach($items as $item)
+                @foreach($navItems as $item)
                     @php
-                        $url = str_starts_with($item->url, '#') && !request()->is('/') ? url('/') . $item->url : $item->url;
+                        $url = $navUrl($item->url);
                         $useNavigate = $wireNavigate($url);
                     @endphp
                     <a href="{{ $url }}"

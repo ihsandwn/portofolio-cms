@@ -45,12 +45,23 @@ export class DocumentStore {
   }
 }
 
-const store = new DocumentStore(
-  Number(process.env.MAX_STORED_DOCUMENTS ?? 20),
-  Number(process.env.DOCUMENT_TTL_MS ?? 1_800_000)
-);
+// Each route handler is bundled separately, so a plain module-level instance gives
+// /api/upload and /api/chat two different Maps: the upload succeeds and the chat then
+// reports "Document unavailable". Pinning the store to globalThis keeps one instance
+// per server process, and also survives dev HMR module reloads.
+const STORE_KEY: unique symbol = Symbol.for('pdf-rag-chatbot.document-store');
+type StoreGlobal = typeof globalThis & { [STORE_KEY]?: DocumentStore };
 
-export const saveDocument = (document: StoredDocument) => store.save(document);
-export const getDocument = (id: string) => store.get(id);
-export const deleteDocument = (id: string) => store.delete(id);
-export const documentCount = () => store.count();
+function getStore(): DocumentStore {
+  const scope = globalThis as StoreGlobal;
+  scope[STORE_KEY] ??= new DocumentStore(
+    Number(process.env.MAX_STORED_DOCUMENTS ?? 20),
+    Number(process.env.DOCUMENT_TTL_MS ?? 1_800_000)
+  );
+  return scope[STORE_KEY];
+}
+
+export const saveDocument = (document: StoredDocument) => getStore().save(document);
+export const getDocument = (id: string) => getStore().get(id);
+export const deleteDocument = (id: string) => getStore().delete(id);
+export const documentCount = () => getStore().count();
