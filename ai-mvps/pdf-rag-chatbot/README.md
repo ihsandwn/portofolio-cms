@@ -45,7 +45,7 @@ Required `.env.local` variables:
 ```env
 GEMINI_API_KEY=your-valid-google-ai-studio-key
 GEMINI_MODEL=gemini-2.5-flash
-GEMINI_EMBEDDING_MODEL=text-embedding-004
+EMBEDDING_MODEL=gemini-embedding-001
 LARAVEL_API_URL=http://localhost:8000
 NEXT_PUBLIC_LARAVEL_API_URL=http://localhost:8000
 ```
