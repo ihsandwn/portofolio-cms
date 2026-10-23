@@ -1,10 +1,22 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
-const { embedText } = vi.hoisted(() => ({
+const { embedText, streamGroundedAnswer } = vi.hoisted(() => ({
   embedText: vi.fn(),
+  streamGroundedAnswer: vi.fn(),
 }));
 
-vi.mock('@/lib/gemini', () => ({ embedText }));
+vi.mock('@/lib/gemini', () => ({ embedText, streamGroundedAnswer }));
+vi.mock('@/lib/db', () => ({ query: (sql: string, values?: unknown[]) => db.query(sql, values) }));
+
+import { PGlite } from '@electric-sql/pglite';
+import { vector } from '@electric-sql/pglite-pgvector';
+import { readFileSync } from 'node:fs';
+import { NextRequest } from 'next/server';
+import { POST as chat } from '../chat/route';
+const db = new PGlite({ extensions: { vector } });
+const embedding = [1, ...Array(3071).fill(0)];
+beforeAll(async () => { await db.exec(readFileSync('db/schema.sql', 'utf8')); }, 30_000);
+afterAll(() => db.close());
 
 import { POST } from './route';
 import { documentCount } from '@/lib/storage';
@@ -34,15 +46,15 @@ function pdf(text: string): Buffer {
 function upload(name = 'guide.pdf') {
   const form = new FormData();
   form.append('file', new File([new Uint8Array(pdf('Llamas live in the Andes'))], name, { type: 'application/pdf' }));
-  return POST(new Request('http://localhost/api/upload', { method: 'POST', body: form }) as never);
+  return POST(new NextRequest('http://localhost/api/upload', { method: 'POST', body: form, headers: { cookie: 'mvp-access-pdf-rag=owner-a' } }));
 }
 
 describe('POST /api/upload', () => {
-  afterEach(() => embedText.mockReset());
+  afterEach(() => { vi.restoreAllMocks(); embedText.mockReset(); streamGroundedAnswer.mockReset(); });
 
   it('parses a real PDF, embeds its text and stores the document', async () => {
-    embedText.mockResolvedValue([0.1, 0.2]);
-    const before = documentCount();
+    embedText.mockResolvedValue(embedding);
+    const before = await documentCount();
 
     const response = await upload('my guide.pdf');
 
@@ -52,19 +64,34 @@ describe('POST /api/upload', () => {
       document: { filename: 'my_guide.pdf', chunkCount: 1 },
     });
     expect(embedText).toHaveBeenCalledWith(expect.stringContaining('Llamas live in the Andes'));
-    expect(documentCount()).toBe(before + 1);
+    expect(await documentCount()).toBe(before + 1);
+  });
+
+  it('chats using persisted upload, blocks another owner and missing auth', async () => {
+    embedText.mockResolvedValue(embedding);
+    streamGroundedAnswer.mockResolvedValue((async function* () { yield { text: () => 'Llamas live in the Andes [p. 1].' }; })());
+    const uploaded = await (await upload()).json();
+    const request = (token?: string) => new NextRequest('http://localhost/api/chat', {
+      method: 'POST', body: JSON.stringify({ documentId: uploaded.document.id, question: 'Where do llamas live?' }),
+      headers: token ? { cookie: `mvp-access-pdf-rag=${token}` } : {},
+    });
+    const response = await chat(request('owner-a'));
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain('Sources: p.1');
+    expect((await chat(request('owner-b'))).status).toBe(404);
+    expect((await chat(request())).status).toBe(401);
   });
 
   it('returns generic 500 and stores nothing when the embedding provider fails', async () => {
     embedText.mockRejectedValue(new Error('provider failure'));
-    const before = documentCount();
+    const before = await documentCount();
     vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const response = await upload();
 
     expect(response.status).toBe(500);
     await expect(response.json()).resolves.toEqual({ error: 'Unable to process upload' });
-    expect(documentCount()).toBe(before);
+    expect(await documentCount()).toBe(before);
   });
 
   it('rejects a non-PDF payload with 400 before calling the provider', async () => {
@@ -72,7 +99,7 @@ describe('POST /api/upload', () => {
     const form = new FormData();
     form.append('file', new File(['hello'], 'fake.pdf', { type: 'application/pdf' }));
 
-    const response = await POST(new Request('http://localhost/api/upload', { method: 'POST', body: form }) as never);
+    const response = await POST(new NextRequest('http://localhost/api/upload', { method: 'POST', body: form, headers: { cookie: 'mvp-access-pdf-rag=owner-a' } }));
 
     expect(response.status).toBe(400);
     expect(embedText).not.toHaveBeenCalled();
