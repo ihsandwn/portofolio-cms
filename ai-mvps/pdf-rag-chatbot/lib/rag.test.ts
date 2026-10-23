@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { chunkPages, cosineSimilarity, retrieveChunks } from './rag';
 import { hasPdfMagicBytes } from './pdf-processor';
-import { DocumentStore } from './storage';
 import { RateLimiter } from './rate-limit';
 
 describe('RAG utilities', () => {
@@ -28,16 +27,7 @@ describe('input and resource controls', () => {
     expect(hasPdfMagicBytes(Buffer.from('not pdf'))).toBe(false);
   });
 
-  it('evicts oldest document when bounded store fills', () => {
-    const store = new DocumentStore(1, 10_000);
-    const uploadedAt = new Date().toISOString();
-    store.save({ id: 'old', filename: 'old.pdf', chunks: [], uploadedAt });
-    store.save({ id: 'new', filename: 'new.pdf', chunks: [], uploadedAt });
-    expect(store.get('old')).toBeUndefined();
-    expect(store.get('new')?.filename).toBe('new.pdf');
-  });
-
-  it('limits requests in fixed window', () => {
+  it('verifies rate limiter bounds', () => {
     const limiter = new RateLimiter(2, 1_000);
     expect(limiter.check('ip', 0).allowed).toBe(true);
     expect(limiter.check('ip', 1).allowed).toBe(true);

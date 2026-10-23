@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { embedText, streamGroundedAnswer } from '@/lib/gemini';
-import { formatCitations, retrieveChunks, truncateToWords } from '@/lib/rag';
+import { formatCitations, truncateToWords } from '@/lib/rag';
 import { RateLimiter } from '@/lib/rate-limit';
-import { getDocument } from '@/lib/storage';
+import { documentExists, ownerKeyFrom, retrieveDocumentChunks } from '@/lib/storage';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,14 +17,15 @@ function clientKey(request: NextRequest): string {
 }
 
 export async function POST(request: NextRequest) {
+  const ownerKey = ownerKeyFrom(request);
+  if (!ownerKey) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (!limiter.check(clientKey(request)).allowed) {
     return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
   }
   try {
     const input = schema.parse(await request.json());
-    const document = getDocument(input.documentId);
-    if (!document) return NextResponse.json({ error: 'Document unavailable' }, { status: 404 });
-    const matches = retrieveChunks(document.chunks, await embedText(input.question));
+    if (!await documentExists(input.documentId, ownerKey)) return NextResponse.json({ error: 'Document unavailable' }, { status: 404 });
+    const matches = await retrieveDocumentChunks(input.documentId, ownerKey, await embedText(input.question));
     if (!matches.length) return new NextResponse('I cannot find that in the document.', { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
     const context = matches.map(chunk => `[p. ${chunk.page}, chunk ${chunk.index}] ${truncateToWords(chunk.text, 300)}`).join('\n\n');
     const stream = await streamGroundedAnswer(context, input.question, input.language);

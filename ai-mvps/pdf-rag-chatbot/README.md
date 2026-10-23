@@ -1,6 +1,6 @@
 # PDF RAG Chatbot - MVP
 
-A Next.js RAG chatbot: upload PDFs, extract and chunk text server-side, store embeddings in memory, and answer questions with source citations using Google Gemini AI.
+A Next.js RAG chatbot: upload PDFs, extract and chunk text server-side, store embeddings in Neon PostgreSQL (pgvector), and answer questions with source citations using Google Gemini AI.
 
 ## Access flow
 
@@ -25,8 +25,8 @@ No Laravel Sanctum token or token revalidation is required by this MVP.
 ## RAG architecture
 
 1. Upload parses a PDF into pages, chunks text with overlap, then embeds chunks with Gemini.
-2. An in-memory server store holds document ID, page texts, chunk embeddings, and metadata for 30 minutes.
-3. Chat embeds the question, retrieves relevant chunks with cosine similarity, then streams an answer grounded only in those chunks with page citations.
+2. Neon PostgreSQL + pgvector (`db/schema.sql`) holds document metadata, chunk text, and embeddings for `DOCUMENT_TTL_MS` (default 30 minutes), bound to the uploader's session. Persistence works across serverless instances.
+3. Chat embeds the question, retrieves relevant chunks with pgvector cosine distance, then streams an answer grounded only in those chunks with page citations.
 4. The browser does not resend the full document after upload; it sends only the question and document ID.
 
 **Limitation:** storage is process-local and cleared by restarts or serverless cold starts. Persistence is not configured in this MVP.
@@ -43,12 +43,15 @@ Open `http://localhost:3000` through the Laravel AI Lab access flow.
 Required `.env.local` variables:
 
 ```env
+DATABASE_URL=postgresql://user:pass@host/db?sslmode=require
 GEMINI_API_KEY=your-valid-google-ai-studio-key
 GEMINI_MODEL=gemini-2.5-flash
 EMBEDDING_MODEL=gemini-embedding-001
 LARAVEL_API_URL=http://localhost:8000
 NEXT_PUBLIC_LARAVEL_API_URL=http://localhost:8000
 ```
+
+Run `db/schema.sql` once against the database (Neon SQL Editor or `psql`). See `VERCEL-NEON-SETUP.md` for Vercel deploy.
 
 Get a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey). The same key supports both chat and embeddings for this app.
 
@@ -107,7 +110,7 @@ pdf-rag-chatbot/
 │   ├── pdf-processor.ts           # PDF parsing and validation
 │   ├── rag.ts                     # Chunking and cosine retrieval
 │   ├── rate-limit.ts              # Baseline per-process limiter
-│   └── storage.ts                 # In-memory document store
+│   └── storage.ts                 # Neon facade, owner key, TTL
 ├── middleware.ts                  # Cookie-based access protection
 └── package.json
 ```
