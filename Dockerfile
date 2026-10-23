@@ -1,4 +1,4 @@
-FROM php:8.3-fpm as base
+FROM php:8.3.36-fpm@sha256:d0dea3f5d95314eac94a732469f4cf0ee658a22c2ce3f2612272b9d5b42d1a72 AS base
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     libzip-dev \
     libicu-dev \
-    && clean-up
+    && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_pgsql pgsql mbstring exif pcntl bcmath gd intl zip
@@ -27,7 +27,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # Development Stage
-FROM base as dev
+FROM base AS dev
 # Install Xdebug if needed (omitted for speed unless requested)
 COPY . .
 # Keep the container running or start php-fpm
@@ -35,7 +35,7 @@ CMD ["php-fpm"]
 
 
 # Production Stage
-FROM base as prod
+FROM base AS prod
 
 # Install Node.js for frontend build
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
