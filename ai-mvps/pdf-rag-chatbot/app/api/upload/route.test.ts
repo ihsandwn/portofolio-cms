@@ -15,11 +15,29 @@ import { NextRequest } from 'next/server';
 import { POST as chat } from '../chat/route';
 const db = new PGlite({ extensions: { vector } });
 const embedding = [1, ...Array(3071).fill(0)];
-beforeAll(async () => { await db.exec(readFileSync('db/schema.sql', 'utf8')); }, 30_000);
-afterAll(() => db.close());
+const TOKEN_A = 'a'.repeat(64);
+const TOKEN_B = 'b'.repeat(64);
+
+// Laravel is the only authority for sessions: every verify call is answered by this stub.
+const laravelStub = () => vi.fn(async (_url: string, init?: RequestInit) => {
+  const body = JSON.parse(String(init?.body ?? '{}'));
+  const valid = /^[A-Za-z0-9]{64}$/.test(String(body.token ?? ''));
+  return new Response(JSON.stringify(valid
+    ? { valid: true, expires_at: Math.floor(Date.now() / 1000) + 600 }
+    : { valid: false }), { status: 200 });
+});
+
+beforeAll(async () => {
+  process.env.LARAVEL_API_URL = 'https://laravel.test';
+  process.env.MVP_APP_SECRET = 's'.repeat(40);
+  vi.stubGlobal('fetch', laravelStub());
+  await db.exec(readFileSync('db/schema.sql', 'utf8'));
+}, 30_000);
+afterAll(() => { db.close(); vi.unstubAllGlobals(); });
 
 import { POST } from './route';
 import { documentCount } from '@/lib/storage';
+import { COOKIE_NAME } from '@/lib/laravel-auth';
 
 function pdf(text: string): Buffer {
   const stream = `BT /F1 18 Tf 72 720 Td (${text}) Tj ET`;
@@ -43,14 +61,18 @@ function pdf(text: string): Buffer {
   return Buffer.from(out, 'latin1');
 }
 
-function upload(name = 'guide.pdf') {
+function upload(name = 'guide.pdf', token: string | null = TOKEN_A) {
   const form = new FormData();
   form.append('file', new File([new Uint8Array(pdf('Llamas live in the Andes'))], name, { type: 'application/pdf' }));
-  return POST(new NextRequest('http://localhost/api/upload', { method: 'POST', body: form, headers: { cookie: 'mvp-access-pdf-rag=owner-a' } }));
+  return POST(new NextRequest('http://localhost/api/upload', {
+    method: 'POST',
+    body: form,
+    headers: token ? { cookie: `${COOKIE_NAME}=${token}` } : {},
+  }));
 }
 
 describe('POST /api/upload', () => {
-  afterEach(() => { vi.restoreAllMocks(); embedText.mockReset(); streamGroundedAnswer.mockReset(); });
+  afterEach(() => { vi.restoreAllMocks(); embedText.mockReset(); streamGroundedAnswer.mockReset(); vi.stubGlobal('fetch', laravelStub()); });
 
   it('parses a real PDF, embeds its text and stores the document', async () => {
     embedText.mockResolvedValue(embedding);
@@ -73,13 +95,23 @@ describe('POST /api/upload', () => {
     const uploaded = await (await upload()).json();
     const request = (token?: string) => new NextRequest('http://localhost/api/chat', {
       method: 'POST', body: JSON.stringify({ documentId: uploaded.document.id, question: 'Where do llamas live?' }),
-      headers: token ? { cookie: `mvp-access-pdf-rag=${token}` } : {},
+      headers: token ? { cookie: `${COOKIE_NAME}=${token}` } : {},
     });
-    const response = await chat(request('owner-a'));
+    const response = await chat(request(TOKEN_A));
     expect(response.status).toBe(200);
     expect(await response.text()).toContain('Sources: p.1');
-    expect((await chat(request('owner-b'))).status).toBe(404);
+    expect((await chat(request(TOKEN_B))).status).toBe(404);
     expect((await chat(request())).status).toBe(401);
+  });
+
+  it('rejects a forged token that Laravel does not recognise', async () => {
+    const forged = 'z'.repeat(64);
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ valid: false }), { status: 200 })));
+
+    const response = await upload('forged.pdf', forged);
+
+    expect(response.status).toBe(401);
+    expect(embedText).not.toHaveBeenCalled();
   });
 
   it('returns generic 500 and stores nothing when the embedding provider fails', async () => {
@@ -99,10 +131,11 @@ describe('POST /api/upload', () => {
     const form = new FormData();
     form.append('file', new File(['hello'], 'fake.pdf', { type: 'application/pdf' }));
 
-    const response = await POST(new NextRequest('http://localhost/api/upload', { method: 'POST', body: form, headers: { cookie: 'mvp-access-pdf-rag=owner-a' } }));
+    const response = await POST(new NextRequest('http://localhost/api/upload', {
+      method: 'POST', body: form, headers: { cookie: `${COOKIE_NAME}=${TOKEN_A}` },
+    }));
 
     expect(response.status).toBe(400);
     expect(embedText).not.toHaveBeenCalled();
   });
 });
-

@@ -12,7 +12,7 @@ Laravel AI Lab is the sole access gate:
 4. The callback writes an HTTP-only access cookie.
 5. Middleware protects app pages and protected API routes while that cookie exists.
 
-No Laravel Sanctum token or token revalidation is required by this MVP.
+Every page and API call revalidates the session against Laravel server-to-server (`POST /api/mvp/auth/verify`); the cookie alone never grants access.
 
 ## Security hardening
 
@@ -29,7 +29,7 @@ No Laravel Sanctum token or token revalidation is required by this MVP.
 3. Chat embeds the question, retrieves relevant chunks with pgvector cosine distance, then streams an answer grounded only in those chunks with page citations.
 4. The browser does not resend the full document after upload; it sends only the question and document ID.
 
-**Limitation:** storage is process-local and cleared by restarts or serverless cold starts. Persistence is not configured in this MVP.
+**Limitation:** documents live only until `DOCUMENT_TTL_MS` (default 30 minutes) and are bound to the uploader's session; expired rows are purged opportunistically on upload.
 
 ## Quick start
 

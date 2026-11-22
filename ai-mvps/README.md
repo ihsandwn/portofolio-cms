@@ -41,22 +41,16 @@ Middleware gates every page on an `mvp-access-*` cookie. That cookie is normally
 the Laravel `/ai-lab` handoff, so hitting `http://localhost:3000` directly used to redirect
 straight back to `http://localhost:8000/ai-lab` and the UI never rendered.
 
-Two ways in:
+One way in — the Laravel handoff (no bypass exists):
 
-**A. Local dev flag (no Laravel needed).** Each `.env.local` carries:
-
-```
-MVP_DEV_BYPASS_AUTH=true
-MVP_SESSION_TTL_SECONDS=3600
-```
-
-With the flag on, the first request seeds a session cookie and the normal auth path runs
-from there. The flag is double-gated — it reads `process.env.NODE_ENV !== 'production'`
-as well as the flag itself, so a production build ignores it entirely. **Never set it on Vercel.**
-
-**B. Full Laravel handoff.** Run `php artisan serve` (port 8000), open `/ai-lab`, pick a
-product, request access, and follow the generated link. Laravel's token lives 10 minutes;
-the MVP session cookie lives `MVP_SESSION_TTL_SECONDS` (default 1 hour, max 24 hours).
+Run `php artisan serve` (port 8000) with the `AI_LAB_*` variables set (see the
+Laravel `.env.example`), open `/ai-lab`, pick a product, submit the access form
+(max 2 sessions per email per product per calendar month, each grant valid
+10 minutes), and follow the generated link. The app exchanges the single-use
+code server-to-server and sets an `HttpOnly` session cookie whose lifetime is
+clamped to the Laravel grant expiry. There is no dev bypass: unauthenticated
+page visits redirect back to `/ai-lab`, and API calls without a Laravel-verified
+session answer 401. Do not invent `MVP_*` flags to skip this — no code reads them.
 
 ### Environment variables
 
@@ -66,8 +60,8 @@ the MVP session cookie lives `MVP_SESSION_TTL_SECONDS` (default 1 hour, max 24 h
 | `GEMINI_MODEL` | Chat/vision model, default `gemini-2.5-flash`. |
 | `EMBEDDING_MODEL` | PDF RAG only. `gemini-embedding-001`. (`text-embedding-004` was retired and returns 404.) |
 | `NEXT_PUBLIC_LARAVEL_API_URL` | Where an unauthenticated visitor is sent. |
-| `MVP_DEV_BYPASS_AUTH` | Local only. Skips the cookie gate. Ignored in production builds. |
-| `MVP_SESSION_TTL_SECONDS` | Session cookie lifetime in seconds. Default 3600, capped at 86400. |
+| `LARAVEL_API_URL` | Server-only base URL of Laravel, used for exchange/verify calls. |
+| `MVP_APP_SECRET` | Server-only shared secret. Must equal the matching `AI_LAB_*_SECRET` in the Laravel `.env` (>= 32 chars), or auth fails closed. |
 
 ### Testing each MVP
 

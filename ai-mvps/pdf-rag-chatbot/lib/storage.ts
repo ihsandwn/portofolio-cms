@@ -2,16 +2,16 @@ import { createHash } from 'node:crypto';
 import { query } from './db';
 import { createNeonDocumentStore } from './neon-storage';
 import type { StoredDocument } from './neon-storage';
-
-export type { StoredDocument } from './neon-storage';
+import { COOKIE_NAME, verifySession } from './laravel-auth';
 
 const store = createNeonDocumentStore(query);
-export const COOKIE_NAME = 'mvp-access-pdf-rag';
+export type { StoredDocument } from './neon-storage';
 
 /** Bind document access to its original session without storing raw cookie values. */
-export function ownerKeyFrom(request: { cookies: { get(name: string): { value: string } | undefined } }): string | null {
+export async function ownerKeyFrom(request: { cookies: { get(name: string): { value: string } | undefined } }): Promise<string | null> {
   const token = request.cookies.get(COOKIE_NAME)?.value;
-  return token ? createHash('sha256').update(token).digest('hex') : null;
+  const session = token ? await verifySession(token) : null;
+  return session ? createHash('sha256').update(token!).digest('hex') : null;
 }
 
 export async function saveDocument(document: StoredDocument, ownerKey: string) {

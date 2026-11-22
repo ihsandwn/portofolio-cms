@@ -46,8 +46,8 @@ export default function Home() {
   };
 
   const copy = language === 'en'
-    ? { title: 'Sentiment Analyzer', subtitle: 'AI-powered text sentiment analysis and emotion detection', input: 'Text Input', results: 'Analysis Results' }
-    : { title: 'Analisis Sentimen', subtitle: 'Analisis sentimen teks dan deteksi emosi dengan AI', input: 'Masukkan Teks', results: 'Hasil Analisis' };
+    ? { title: 'Sentiment Analyzer', subtitle: 'AI-powered text sentiment analysis and emotion detection', input: 'Text Input', results: 'Analysis Results', note: 'Text is sent for AI processing. Do not submit personal or sensitive information.' }
+    : { title: 'Analisis Sentimen', subtitle: 'Analisis sentimen teks dan deteksi emosi dengan AI', input: 'Masukkan Teks', results: 'Hasil Analisis', note: 'Teks dikirim untuk diproses AI. Jangan kirim informasi pribadi atau sensitif.' };
 
   return (
     <main className="min-h-screen p-4 md:p-8">
@@ -58,6 +58,7 @@ export default function Home() {
             <div className="text-center flex-1">
               <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-900 via-blue-600 to-blue-400 bg-clip-text text-transparent mb-2">{copy.title}</h1>
               <p className="text-gray-600 dark:text-gray-400 text-lg">{copy.subtitle}</p>
+              <p className="mt-3 text-sm text-gray-600 dark:text-gray-300" role="note">{copy.note}</p>
             </div>
             <div className="flex-1 flex justify-center md:justify-end"><LanguageToggle onLanguageChange={setLanguage} /></div>
           </div>

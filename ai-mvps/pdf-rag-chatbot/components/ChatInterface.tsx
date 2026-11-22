@@ -82,7 +82,7 @@ export default function ChatInterface({ documentId, language = 'en' }: ChatInter
                 ...prev,
                 {
                     role: 'assistant',
-                    content: 'Sorry, I encountered an error. Please try again.',
+                    content: language === 'id' ? 'Maaf, terjadi kesalahan. Silakan coba lagi.' : 'Sorry, I encountered an error. Please try again.',
                 },
             ]);
         } finally {
@@ -97,7 +97,7 @@ export default function ChatInterface({ documentId, language = 'en' }: ChatInter
                 {messages.length === 0 ? (
                     <div className="text-center text-gray-500 dark:text-gray-400 mt-8">
                         <Bot className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                        <p>Ask me anything about the document!</p>
+                        <p>{language === 'id' ? 'Tanyakan apa saja tentang dokumen ini!' : 'Ask me anything about the document!'}</p>
                     </div>
                 ) : (
                     messages.map((message, index) => (
@@ -135,7 +135,8 @@ export default function ChatInterface({ documentId, language = 'en' }: ChatInter
                             <Bot className="w-5 h-5 text-white" />
                         </div>
                         <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl px-4 py-3">
-                            <Loader2 className="w-5 h-5 text-gray-500 animate-spin" />
+                            <Loader2 className="w-5 h-5 text-gray-500 animate-spin" aria-hidden="true" />
+                            <span className="sr-only">{language === 'id' ? 'Menunggu jawaban' : 'Waiting for response'}</span>
                         </div>
                     </div>
                 )}
@@ -145,11 +146,11 @@ export default function ChatInterface({ documentId, language = 'en' }: ChatInter
             {/* Input Form */}
             <form onSubmit={handleSubmit} className="flex gap-2">
                 <input
-                    aria-label="Question about document"
+                    aria-label={language === 'id' ? 'Pertanyaan tentang dokumen' : 'Question about document'}
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Ask a question about the document..."
+                    placeholder={language === 'id' ? 'Tanyakan hal tentang dokumen...' : 'Ask a question about the document...'}
                     disabled={loading}
                     className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                 />
@@ -159,9 +160,12 @@ export default function ChatInterface({ documentId, language = 'en' }: ChatInter
                     className="px-6 py-3 bg-gradient-to-r from-blue-900 to-blue-500 text-white rounded-xl hover:from-blue-800 hover:to-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 font-medium shadow-lg"
                 >
                     {loading ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <>
+                        <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
+                        <span className="sr-only">{language === 'id' ? 'Mengirim' : 'Sending'}</span>
+                        </>
                     ) : (
-                        <><Send className="w-5 h-5" /> Send</>
+                        <><Send className="w-5 h-5" /> {language === 'id' ? 'Kirim' : 'Send'}</>
                     )}
                 </button>
             </form>

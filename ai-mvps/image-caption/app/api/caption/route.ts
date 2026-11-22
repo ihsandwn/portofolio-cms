@@ -2,11 +2,27 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateImageCaption } from '@/lib/gemini-vision';
 import { LanguageSchema } from '@/lib/schemas';
 import { validateImageUpload } from '@/lib/image-validation';
+import { COOKIE_NAME, verifySession } from '@/lib/auth';
+import { withRateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
+  // Process-local per-IP sliding window (30 req/min). Best-effort abuse
+  // protection only — the session check below is the security boundary.
+  // A shared store (e.g. Redis/Upstash) is the follow-up for multi-instance
+  // deployments; see docs/portfolio-redesign-prd.md item 5.
+  const limited = await withRateLimit(request, () => handleCaption(request));
+  if (limited) return limited;
+  return NextResponse.json({ error: 'Unable to process image' }, { status: 500 });
+}
+
+async function handleCaption(request: NextRequest) {
+  const token = request.cookies.get(COOKIE_NAME)?.value;
+  if (!(await verifySession(token))) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     const formData = await request.formData();
     const fileValue = formData.get('file');

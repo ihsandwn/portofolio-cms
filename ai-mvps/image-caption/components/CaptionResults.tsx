@@ -30,7 +30,7 @@ export default function CaptionResults({ result, imageUrl, language }: CaptionRe
         <div className="relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
           <img
             src={imageUrl}
-            alt="Uploaded image"
+            alt={language === 'en' ? 'Uploaded image' : 'Gambar yang diunggah'}
             className="w-full h-48 object-cover"
           />
         </div>

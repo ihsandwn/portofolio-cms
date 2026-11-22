@@ -31,6 +31,11 @@ export default function Home() {
               <p className="text-gray-600 dark:text-gray-400 text-lg">
                 {language === 'en' ? 'Upload a PDF document and chat with it using AI' : 'Unggah dokumen PDF dan ngobrol dengan AI'}
               </p>
+              <p className="mt-3 text-sm text-gray-600 dark:text-gray-300" role="note">
+                {language === 'en'
+                  ? 'PDF content is sent for AI processing. Do not upload confidential documents.'
+                  : 'Isi PDF dikirim untuk diproses AI. Jangan unggah dokumen rahasia.'}
+              </p>
             </div>
             <div className="flex-1 flex justify-end">
               <LanguageToggle onLanguageChange={setLanguage} />
@@ -48,7 +53,7 @@ export default function Home() {
                 {language === 'en' ? 'Upload Document' : 'Unggah Dokumen'}
               </h2>
             </div>
-            <PDFUploader onUploadSuccess={handleUploadSuccess} />
+            <PDFUploader onUploadSuccess={handleUploadSuccess} language={language} />
 
             {documentId && (
               <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">

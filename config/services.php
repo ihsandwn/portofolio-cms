@@ -35,4 +35,28 @@ return [
         ],
     ],
 
+    // AI Lab handoff. Each app has its own shared secret and public origin; the
+    // audience key must match the app's slug so a session cannot cross apps.
+    'ai_lab' => [
+        'cache_store' => env('AI_LAB_CACHE_STORE'),
+        'apps' => [
+            'sentiment-analyzer' => [
+                'url' => env('AI_LAB_SENTIMENT_URL'),
+                'secret' => env('AI_LAB_SENTIMENT_SECRET'),
+            ],
+            'hr-screening' => [
+                'url' => env('AI_LAB_HR_URL'),
+                'secret' => env('AI_LAB_HR_SECRET'),
+            ],
+            'image-caption' => [
+                'url' => env('AI_LAB_IMAGE_URL'),
+                'secret' => env('AI_LAB_IMAGE_SECRET'),
+            ],
+            'pdf-rag-chatbot' => [
+                'url' => env('AI_LAB_PDF_URL'),
+                'secret' => env('AI_LAB_PDF_SECRET'),
+            ],
+        ],
+    ],
+
 ];

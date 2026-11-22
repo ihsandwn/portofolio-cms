@@ -37,6 +37,11 @@ export default function Home() {
               <p className="text-gray-600 dark:text-gray-400 text-lg">
                 {language === 'en' ? 'AI-powered image analysis and categorization' : 'Analisis dan kategorisasi gambar dengan AI'}
               </p>
+              <p className="mt-3 text-sm text-gray-600 dark:text-gray-300" role="note">
+                {language === 'en'
+                  ? 'Images are sent for AI processing. Do not upload private or sensitive photos.'
+                  : 'Gambar dikirim untuk diproses AI. Jangan unggah foto pribadi atau sensitif.'}
+              </p>
             </div>
             <div className="flex-1 flex justify-end">
               <LanguageToggle language={language} onLanguageChange={handleLanguageChange} />

@@ -17,7 +17,7 @@ function clientKey(request: NextRequest): string {
 }
 
 export async function POST(request: NextRequest) {
-  const ownerKey = ownerKeyFrom(request);
+  const ownerKey = await ownerKeyFrom(request);
   if (!ownerKey) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (!limiter.check(clientKey(request)).allowed) {
     return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });

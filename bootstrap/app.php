@@ -12,6 +12,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Only trust X-Forwarded-* headers from explicitly listed proxies.
+        // Leave TRUSTED_PROXIES empty when the app is directly exposed so
+        // request()->ip() (used for AI Lab rate limiting) cannot be spoofed.
+        // Format: comma-separated IPs or CIDR ranges, or "*" behind a
+        // fully controlled load balancer. See .env.example.
+        $trustedProxies = array_values(array_filter(array_map(
+            trim(...),
+            explode(',', (string) env('TRUSTED_PROXIES', ''))
+        )));
+        if ($trustedProxies !== []) {
+            $middleware->trustProxies(at: $trustedProxies);
+        }
+
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,

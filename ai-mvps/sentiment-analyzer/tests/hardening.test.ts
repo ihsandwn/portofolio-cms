@@ -3,7 +3,19 @@ import test from 'node:test';
 import { analyzeRequestSchema, sentimentResultSchema, languageSchema } from '../lib/schemas.ts';
 import { createRateLimiter } from '../lib/rate-limit.ts';
 import { isAllowedOrigin } from '../lib/origin.ts';
-import { accessTokenSchema } from '../lib/auth.ts';
+import { accessTokenSchema, AUDIENCE, exchangeCode, verifySession } from '../lib/auth.ts';
+import { readFileSync } from 'node:fs';
+
+const readUi = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
+
+test('public UI keeps Indonesian data handling and recovery guidance visible', () => {
+    const page = readUi('../app/page.tsx');
+    const input = readUi('../components/TextInput.tsx');
+
+    assert.match(page, /Teks dikirim untuk diproses AI/);
+    assert.match(input, /Coba contoh/);
+    assert.match(page, /Silakan coba lagi/);
+});
 
 test('request schema enforces language and text limits', () => {
     assert.equal(analyzeRequestSchema.safeParse({ text: 'x', language: 'fr' }).success, false);
@@ -51,4 +63,62 @@ test('access token requires 64 alphanumeric characters', () => {
     assert.equal(accessTokenSchema.safeParse('a'.repeat(64)).success, true);
     assert.equal(accessTokenSchema.safeParse('short').success, false);
     assert.equal(accessTokenSchema.safeParse(`${'a'.repeat(63)}-`).success, false);
+});
+
+test('session verification fails closed without server config', async () => {
+    const url = process.env.LARAVEL_API_URL;
+    const publicUrl = process.env.NEXT_PUBLIC_LARAVEL_API_URL;
+    const secret = process.env.MVP_APP_SECRET;
+    delete process.env.LARAVEL_API_URL;
+    delete process.env.NEXT_PUBLIC_LARAVEL_API_URL;
+    delete process.env.MVP_APP_SECRET;
+    try {
+        assert.equal(await verifySession('a'.repeat(64)), null);
+    } finally {
+        if (url) process.env.LARAVEL_API_URL = url;
+        if (publicUrl) process.env.NEXT_PUBLIC_LARAVEL_API_URL = publicUrl;
+        if (secret) process.env.MVP_APP_SECRET = secret;
+    }
+});
+
+test('Laravel is the authority: rejected, unreachable and malformed answers deny access', async () => {
+    const original = globalThis.fetch;
+    process.env.LARAVEL_API_URL = 'https://laravel.test';
+    process.env.MVP_APP_SECRET = 's'.repeat(40);
+    const token = 'a'.repeat(64);
+    try {
+        globalThis.fetch = (async () => new Response(JSON.stringify({ valid: false }), { status: 200 })) as unknown as typeof fetch;
+        assert.equal(await verifySession(token), null);
+
+        globalThis.fetch = (async () => { throw new Error('down'); }) as unknown as typeof fetch;
+        assert.equal(await verifySession(token), null);
+
+        globalThis.fetch = (async () => new Response('not json', { status: 200 })) as unknown as typeof fetch;
+        assert.equal(await verifySession(token), null);
+
+        let sent: Record<string, unknown> = {};
+        globalThis.fetch = (async (_url: string, init?: RequestInit) => {
+            sent = JSON.parse(String(init?.body));
+            return new Response(JSON.stringify({ valid: true, expires_at: Math.floor(Date.now() / 1000) + 600 }), { status: 200 });
+        }) as unknown as typeof fetch;
+        const session = await verifySession(token);
+        assert.equal(typeof session?.expiresAt, 'number');
+        assert.equal(sent.audience, AUDIENCE);
+        assert.equal(sent.token, token);
+    } finally {
+        globalThis.fetch = original;
+    }
+});
+
+test('handoff exchange rejects wrong-shaped codes before calling Laravel', async () => {
+    const original = globalThis.fetch;
+    let called = false;
+    globalThis.fetch = (async () => { called = true; return new Response('{}', { status: 200 }); }) as unknown as typeof fetch;
+    try {
+        assert.equal(await exchangeCode('short'), null);
+        assert.equal(await exchangeCode('a'.repeat(64)), null);
+        assert.equal(called, false);
+    } finally {
+        globalThis.fetch = original;
+    }
 });

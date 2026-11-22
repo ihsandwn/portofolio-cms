@@ -14,8 +14,8 @@ class LanguageSwitch extends Component
             Session::put('locale', $locale);
             App::setLocale($locale);
             
-            // Reload the page to reflect changes
-            return $this->redirect(request()->header('Referer'), navigate: true);
+            // Reload the document so its lang and SEO metadata match the new locale.
+            return $this->redirect(request()->header('Referer'));
         }
     }
 

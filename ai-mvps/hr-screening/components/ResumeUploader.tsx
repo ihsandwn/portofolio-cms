@@ -68,6 +68,8 @@ const data = await response.json();
         <div className="space-y-4">
             <div
                 {...getRootProps()}
+                role="button"
+                tabIndex={0}
                 aria-busy={screening}
                 aria-label={language === 'en' ? 'Upload PDF resume' : 'Unggah resume PDF'}
                 className={`
@@ -81,7 +83,7 @@ const data = await response.json();
             >
                 <input {...getInputProps()} disabled={screening} aria-label={language === 'en' ? 'Select PDF resume' : 'Pilih resume PDF'} />
 
-                <div className="flex flex-col items-center gap-3">
+                <div className="flex flex-col items-center gap-3" aria-live="polite">
 {screening ? (
                          <Loader2 aria-hidden="true" className="w-12 h-12 text-blue-500 animate-spin" />
 ) : fileName ? (
@@ -126,7 +128,7 @@ const data = await response.json();
             </div>
 
             {error && (
-                <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <div role="alert" className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                     <AlertCircle aria-hidden="true" className="w-5 h-5 text-red-500 flex-shrink-0" />
                     <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
                 </div>

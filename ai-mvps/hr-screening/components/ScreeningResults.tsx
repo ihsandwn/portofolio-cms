@@ -44,19 +44,34 @@ export default function ScreeningResults({ result, language }: ScreeningResultsP
         return 'from-red-600 to-red-400';
     };
 
+    const getRecommendationLabel = () => {
+        if (language !== 'id') return result.recommendation;
+        const map: Record<string, string> = {
+            'Highly Recommended': 'Sangat Direkomendasikan',
+            'Recommended': 'Direkomendasikan',
+            'Maybe': 'Mungkin',
+            'Not Recommended': 'Tidak Direkomendasikan',
+        };
+        return map[result.recommendation] ?? result.recommendation;
+    };
+
+    const copy = language === 'en'
+        ? { score: 'Overall score', recommendation: 'Recommendation', summary: 'Summary', matched: 'Matching skills', missing: 'Skills to review', experience: 'Experience', education: 'Education', relevance: 'Relevance', strengths: 'Strengths', concerns: 'Concerns' }
+        : { score: 'Skor keseluruhan', recommendation: 'Rekomendasi', summary: 'Ringkasan', matched: 'Keterampilan yang sesuai', missing: 'Keterampilan yang perlu ditinjau', experience: 'Pengalaman', education: 'Pendidikan', relevance: 'Relevansi', strengths: 'Kekuatan', concerns: 'Hal yang perlu diperhatikan' };
+
     return (
-        <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
+        <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2" aria-live="polite">
             {/* Overall Score */}
             <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700/50 dark:to-gray-800/50 rounded-xl">
                 <div className={`text-6xl font-bold bg-gradient-to-r ${getScoreColor(result.overallScore)} bg-clip-text text-transparent mb-2`}>
                     {result.overallScore}
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Overall Score</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{copy.score}</p>
             </div>
 
             {/* Recommendation */}
             <div className={`p-4 rounded-lg border ${getRecommendationColor()}`}>
-                <p className="font-semibold text-center">{result.recommendation}</p>
+                <p className="font-semibold text-center">{getRecommendationLabel()}</p>
             </div>
 
             {/* Summary */}
@@ -71,7 +86,7 @@ export default function ScreeningResults({ result, language }: ScreeningResultsP
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium">
                         <CheckCircle className="w-4 h-4 text-green-500" />
-                        <span className="text-sm">Matched Skills</span>
+                        <span className="text-sm">{copy.matched}</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                         {result.matchedSkills.map((skill: string, index: number) => (
@@ -91,7 +106,7 @@ export default function ScreeningResults({ result, language }: ScreeningResultsP
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium">
                         <XCircle className="w-4 h-4 text-red-500" />
-                        <span className="text-sm">Missing Skills</span>
+                        <span className="text-sm">{copy.missing}</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                         {result.missingSkills.map((skill: string, index: number) => (
@@ -111,10 +126,10 @@ export default function ScreeningResults({ result, language }: ScreeningResultsP
                 <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                         <Award className="w-4 h-4 text-blue-500" />
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Experience</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{copy.experience}</span>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {result.experience.years} years • Relevance: {result.experience.relevance}
+                        {result.experience.years} {language === 'en' ? 'years' : 'tahun'} • {copy.relevance}: {result.experience.relevance}
                     </p>
                 </div>
             )}
@@ -124,10 +139,10 @@ export default function ScreeningResults({ result, language }: ScreeningResultsP
                 <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                         <BookOpen className="w-4 h-4 text-blue-500" />
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Education</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{copy.education}</span>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {result.education.level} • Relevance: {result.education.relevance}
+                        {result.education.level} • {copy.relevance}: {result.education.relevance}
                     </p>
                 </div>
             )}
@@ -137,7 +152,7 @@ export default function ScreeningResults({ result, language }: ScreeningResultsP
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium">
                         <Lightbulb className="w-4 h-4 text-blue-500" />
-                        <span className="text-sm">Strengths</span>
+                        <span className="text-sm">{copy.strengths}</span>
                     </div>
                     <ul className="space-y-1">
                         {result.strengths.map((strength: string, index: number) => (
@@ -154,7 +169,7 @@ export default function ScreeningResults({ result, language }: ScreeningResultsP
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium">
                         <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                        <span className="text-sm">Concerns</span>
+                        <span className="text-sm">{copy.concerns}</span>
                     </div>
                     <ul className="space-y-1">
                         {result.concerns.map((concern: string, index: number) => (

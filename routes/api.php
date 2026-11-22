@@ -24,6 +24,11 @@ Route::prefix('mvp')->group(function () {
             'timestamp' => now()->toIso8601String(),
         ]);
     });
+
+    // AI Lab app-to-app exchange. Apps authenticate with their own shared secret;
+    // callers never mint access from a query parameter or cookie shape.
+    Route::post('/auth/exchange', [App\Http\Controllers\Auth\AiLabAuthController::class, 'exchange'])->middleware('throttle:60,1');
+    Route::post('/auth/verify', [App\Http\Controllers\Auth\AiLabAuthController::class, 'verify'])->middleware('throttle:60,1');
 });
 
 // Protected API routes (require Sanctum authentication)

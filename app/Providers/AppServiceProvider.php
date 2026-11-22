@@ -24,5 +24,9 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('safeHtml', function (string $expression): string {
             return "<?php echo App\Helpers\Sanitizer::clean($expression); ?>";
         });
+
+        Blade::directive('safeSvg', function (string $expression): string {
+            return "<?php echo App\Helpers\Sanitizer::svg($expression); ?>";
+        });
     }
 }
