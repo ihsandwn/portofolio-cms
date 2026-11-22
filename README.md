@@ -1,24 +1,22 @@
 
 # 🚀 CMS Portfolio (CMS Portofolio)
 
-A modern, high-performance Content Management System & Personal Portfolio built with **Laravel 11**, **Livewire 3**, and **TailwindCSS**.  
-Featuring a premium "Dark Blue & Electric Blue" SaaS-style Admin Dashboard, AI-ready architecture, and a fully containerized deployment strategy.
+A modern, high-performance Content Management System & Personal Portfolio built with **Laravel 12**, **Livewire 4**, and **TailwindCSS**.  
+Featuring a light "Technical Blueprint" public site, an AI Lab with four Next.js demo apps behind a server-to-server session exchange, and a fully containerized deployment strategy.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Laravel](https://img.shields.io/badge/laravel-11.x-red.svg)
-![Livewire](https://img.shields.io/badge/livewire-3.x-pink.svg)
-![PHP](https://img.shields.io/badge/php-8.2+-777BB4.svg)
+![Laravel](https://img.shields.io/badge/laravel-12.x-red.svg)
+![Livewire](https://img.shields.io/badge/livewire-4.x-pink.svg)
+![PHP](https://img.shields.io/badge/php-8.3+-777BB4.svg)
 
 ---
 
 ## ✨ Key Features
 
 ### 🎨 Premium UI/UX
--   **Frontend**: Futurustic "Clean Dark" theme with `Slate-950` backgrounds and neon accents.
--   **Interactive Components**:
-    -   **Flipbook Viewer**: 3D page-turning experience for PDF ebooks.
-    -   **Glassmorphism Carousel**: Smooth image styling with ambient background effects.
--   **Admin Panel**: Detached sidebar, dynamic data visualization, and full mobile responsiveness.
+-   **Public site**: Light "Technical Blueprint" theme (Inter + Space Grotesk, sharp corners, blueprint dot grid), bilingual EN/ID, keyboard-navigable with visible focus and reduced-motion support.
+-   **Portfolio**: Table-first selected-work index; case-study pages separate summary, context/role, approach/evidence, and verified links. Measured outcomes are shown only when documented.
+-   **AI Lab**: Catalogue of four Next.js demo apps (sentiment-analyzer, hr-screening, image-caption, pdf-rag-chatbot). Access is granted via a CSRF-protected POST handoff that mints a 60-second single-use code; apps exchange it server-to-server for an opaque session. See [docs/ai-lab-auth.md](docs/ai-lab-auth.md).
 
 ### 📚 Content System
 -   **Bilingual Support**: Full English & Indonesian localization for Blog Posts.
@@ -26,8 +24,8 @@ Featuring a premium "Dark Blue & Electric Blue" SaaS-style Admin Dashboard, AI-r
 -   **Smart Storage**: Native CPanel compatibility mode (`/storage` route proxy) to bypass hosting restrictions.
 
 ### 🛠 Tech Stack
--   **Backend**: Laravel 11, Spatie Permission.
--   **Frontend**: Livewire 3, Volt, TailwindCSS, Alpine.js (v3).
+-   **Backend**: Laravel 12, Spatie Permission.
+-   **Frontend**: Livewire 4, Volt, TailwindCSS, Alpine.js (v3).
 -   **Database**: PostgreSQL / SQLite / MySQL.
 -   **Storage**: Local Filesystem with PHP-based serving fallback.
 
@@ -72,7 +70,7 @@ Featuring a premium "Dark Blue & Electric Blue" SaaS-style Admin Dashboard, AI-r
 
 ## 📦 Deployment
 
-For detailed instructions on deploying to Staging or Production environments, please refer to the [Deployment Guide](DEPLOYMENT.md).
+For detailed instructions on deploying to Staging or Production environments, please refer to the [Deployment Guide](DEPLOYMENT.md). For the current production topology (Laravel on Hostinger + 4 AI modules on Vercel + MySQL, latest code), see [docs/DEPLOYMENT-PRODUCTION.md](docs/DEPLOYMENT-PRODUCTION.md).
 
 > [!NOTE]
 > See **[DEPLOYMENT.md](DEPLOYMENT.md)** for Docker Production strategies, Nginx config, and Environment setup.

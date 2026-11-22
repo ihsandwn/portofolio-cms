@@ -8,31 +8,21 @@
         </div>
     </header>
 
-    <div class="w-full overflow-x-auto border border-outline-variant/20 bg-surface-container-lowest">
-        <table class="w-full text-left border-collapse min-w-[640px]">
-            <thead>
-                <tr class="border-b border-outline-variant/30 text-secondary font-label text-[10px] tracking-widest uppercase">
-                    <th class="pb-4 pt-4 font-medium px-4">{{ __('Project UID') }}</th>
-                    <th class="pb-4 pt-4 font-medium px-4">{{ __('Project name') }}</th>
-                    <th class="pb-4 pt-4 font-medium px-4 hidden lg:table-cell">{{ __('Tech stack') }}</th>
-                    <th class="pb-4 pt-4 font-medium px-4 hidden md:table-cell">{{ __('Role') }}</th>
-                    <th class="pb-4 pt-4 font-medium px-4 text-right">{{ __('Reference') }}</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-outline-variant/10">
-                @foreach($portfolios as $portfolio)
-                    @php
-                        $href = $portfolio->type === 'ai_agent' ? route('ai-lab.show', $portfolio->slug) : route('portfolio.show', $portfolio->slug);
-                        $uid = $portfolio->completed_at
-                            ? $portfolio->completed_at->format('Y.m')
-                            : $portfolio->created_at->format('Y.m');
-                        $role = data_get($portfolio->meta_data, 'role')
-                            ?? ($portfolio->type === 'ai_agent' ? __('AI Solutions') : __('Development'));
-                    @endphp
-                    <tr class="group hover:bg-surface-container-low transition-colors duration-blueprint">
-                        <td class="py-6 md:py-8 px-4 font-label text-[11px] text-outline mono-num align-top">{{ $uid }}</td>
-                        <td class="py-6 md:py-8 px-4 align-top">
-                            <div class="flex items-start gap-4">
+    <div class="border border-outline-variant/20 bg-surface-container-lowest divide-y divide-outline-variant/10">
+        @foreach($portfolios as $portfolio)
+            @php
+                $href = $portfolio->type === 'ai_agent' ? route('ai-lab.show', $portfolio->slug) : route('portfolio.show', $portfolio->slug);
+                $uid = $portfolio->completed_at
+                    ? $portfolio->completed_at->format('Y.m')
+                    : $portfolio->created_at->format('Y.m');
+                $role = data_get($portfolio->meta_data, 'role')
+                    ?? ($portfolio->type === 'ai_agent' ? __('AI Solutions') : __('Development'));
+            @endphp
+            <article class="group p-5 md:p-6 hover:bg-surface-container-low transition-colors duration-blueprint">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 md:items-start">
+                    <div class="md:col-span-2 font-label text-xs text-secondary mono-num">{{ $uid }}</div>
+                    <div class="md:col-span-7 min-w-0">
+                        <div class="flex items-start gap-4">
                                 <div class="w-10 h-10 shrink-0 bg-surface-container-highest flex items-center justify-center border border-outline-variant/20 overflow-hidden">
                                     @if($portfolio->image)
                                         <img src="{{ \Illuminate\Support\Facades\Storage::url($portfolio->image) }}" alt="" class="w-full h-full object-cover">
@@ -43,36 +33,26 @@
                                     @endif
                                 </div>
                                 <div class="min-w-0">
-                                    <div class="font-headline font-bold text-on-background tracking-tight">{{ $portfolio->title }}</div>
-                                    <p class="text-secondary text-xs mt-1 line-clamp-2 max-w-md">{{ $portfolio->description }}</p>
-                                    <div class="lg:hidden mt-2 flex flex-wrap gap-2">
-                                        @foreach(collect($portfolio->tech_stack ?? [])->take(4) as $tech)
-                                            <span class="font-label text-[9px] text-primary">{{ is_string($tech) ? strtoupper($tech) : $tech }}</span>
+                                    <h3 class="font-headline font-bold text-on-background tracking-tight leading-snug">{{ $portfolio->title }}</h3>
+                                    <p class="text-secondary text-sm mt-1.5 leading-relaxed line-clamp-2">{{ $portfolio->description }}</p>
+                                    <p class="mt-2 font-label text-[11px] uppercase tracking-wider text-outline">{{ $role }}</p>
+                                    <div class="mt-3 flex flex-wrap gap-2">
+                                        @foreach(collect($portfolio->tech_stack ?? [])->take(6) as $tech)
+                                            <span class="px-2 py-0.5 bg-surface-container-high text-on-surface-variant font-label text-[11px]">{{ is_string($tech) ? strtoupper($tech) : $tech }}</span>
                                         @endforeach
                                     </div>
                                 </div>
                             </div>
-                        </td>
-                        <td class="py-6 md:py-8 px-4 hidden lg:table-cell align-top">
-                            <div class="flex flex-wrap gap-2">
-                                @foreach(collect($portfolio->tech_stack ?? [])->take(8) as $tech)
-                                    <span class="px-2 py-0.5 bg-surface-container-high text-on-surface-variant font-label text-[10px]">{{ is_string($tech) ? strtoupper($tech) : $tech }}</span>
-                                @endforeach
-                            </div>
-                        </td>
-                        <td class="py-6 md:py-8 px-4 hidden md:table-cell align-top">
-                            <span class="font-body text-xs text-secondary italic">{{ $role }}</span>
-                        </td>
-                        <td class="py-6 md:py-8 px-4 text-right align-top">
-                            <a href="{{ $href }}" wire:navigate class="inline-flex items-center gap-1 text-primary hover:text-primary-dim transition-colors group/link font-label text-[10px] tracking-widest uppercase">
-                                {{ __('View Case Study') }}
-                                <svg class="w-3.5 h-3.5 shrink-0 transform group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M7 7h10v10"></path></svg>
-                            </a>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+                    </div>
+                    <div class="md:col-span-3 md:text-right">
+                        <a href="{{ $href }}" wire:navigate class="inline-flex min-h-11 items-center gap-1 text-primary hover:text-primary-dim transition-colors group/link font-label text-[11px] tracking-widest uppercase">
+                            {{ __('View Case Study') }}
+                            <svg class="w-3.5 h-3.5 shrink-0 transform group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M7 7h10v10"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            </article>
+        @endforeach
     </div>
 
     <div class="mt-10">

@@ -1,34 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { COOKIE_NAME, exchangeCode } from '@/lib/auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// Laravel grants a 10-minute access token, but the browser session here is what decides
-// how long the UI stays reachable. 600s meant the page bounced back to /ai-lab mid-use.
-const DEFAULT_TTL_SECONDS = 3600;
 const MAX_TTL_SECONDS = 86_400;
 
-function sessionTtl(): number {
-    const raw = Number(process.env.MVP_SESSION_TTL_SECONDS);
-    if (!Number.isFinite(raw) || raw <= 0) return DEFAULT_TTL_SECONDS;
-    return Math.min(Math.trunc(raw), MAX_TTL_SECONDS);
+function cookieTtl(expiresAt: number): number {
+    return Math.max(1, Math.min(Math.trunc(expiresAt - Date.now() / 1000), MAX_TTL_SECONDS));
 }
 
+// Only a short-lived, single-use code is accepted here. Grant tokens in the URL are
+// rejected outright: Laravel consumes them at the POST handoff, never at the app.
 export async function GET(request: NextRequest) {
-    const token = request.nextUrl.searchParams.get('token');
-
-    if (!token) {
-        return NextResponse.json({ error: 'Missing token' }, { status: 400 });
+    const code = request.nextUrl.searchParams.get('code');
+    const session = code ? await exchangeCode(code) : null;
+    if (!session) {
+        return NextResponse.redirect(new URL('/', request.url));
     }
 
     const response = NextResponse.redirect(new URL('/', request.url));
-    response.cookies.set('mvp-access-image-caption', token, {
+    response.cookies.set(COOKIE_NAME, session.token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
-        maxAge: sessionTtl(),
+        maxAge: cookieTtl(session.expiresAt),
     });
-
     return response;
 }

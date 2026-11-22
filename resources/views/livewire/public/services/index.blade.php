@@ -8,11 +8,11 @@
         @foreach($services as $service)
         <article class="p-8 border border-outline-variant/20 bg-surface-container-lowest hover:border-outline-variant/40 transition-colors duration-blueprint">
             <div class="w-12 h-12 bg-primary-container flex items-center justify-center text-on-primary-container mb-6 [&_svg]:w-6 [&_svg]:h-6">
-                {!! $service->icon ?? '' !!}
+                @safeSvg($service->icon ?? '')
             </div>
             <h2 class="text-xl font-headline font-semibold text-on-background mb-3">{{ $service->title }}</h2>
             <p class="text-secondary leading-relaxed mb-6">{{ $service->description }}</p>
-            <span class="font-label text-[10px] font-semibold text-primary uppercase tracking-[0.15em]">{{ str_replace('_', ' ', $service->category) }}</span>
+            <span class="font-label text-[11px] font-semibold text-primary uppercase tracking-[0.15em]">{{ str_replace('_', ' ', $service->category) }}</span>
         </article>
         @endforeach
     </div>

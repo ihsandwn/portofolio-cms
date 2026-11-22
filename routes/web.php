@@ -64,7 +64,16 @@ Route::get('/portfolio/{slug}', App\Livewire\Public\Portfolio\Show::class)->name
 
 Route::get('/ai-lab', App\Livewire\Public\AiLab\Index::class)->name('ai-lab.index');
 Route::get('/ai-lab/{slug}', App\Livewire\Public\AiLab\Show::class)->name('ai-lab.show');
-Route::get('/ai-lab/auth/{token}', [App\Http\Controllers\Auth\AiLabAuthController::class, 'validateAndRedirect'])->name('ai-lab.auth');
+
+// POST handoff: consumes grant, mints a 60-second audience-bound code, redirects
+// to the app callback with ?code=... (no grant token in URL).
+Route::post('/ai-lab/auth', [App\Http\Controllers\Auth\AiLabAuthController::class, 'handoff'])->middleware('throttle:20,1')->name('ai-lab.auth');
+
+// Legacy GET route kept so existing Blade links return 405→show instead of leaking
+// a token. The token param is ignored and the user lands on the project page.
+Route::get('/ai-lab/auth/{token}', function () {
+    return redirect()->route('ai-lab.index');
+})->name('ai-lab.auth.legacy');
 
 // Fallback for Shared Hosting (cPanel) where symlink() is disabled
 // OWASP: Path traversal prevention - ensure path stays within storage/app/public

@@ -35,7 +35,12 @@ export default function Home() {
                 {language === 'en' ? 'Automated HR Screening' : 'Screening HR Otomatis'}
               </h1>
               <p className="text-gray-600 dark:text-gray-400 text-lg">
-                {language === 'en' ? 'AI-powered resume screening and job description matching' : 'Screening resume dan pencocokan job description dengan AI'}
+                {language === 'en' ? 'AI-assisted resume screening and job description matching' : 'Penyaringan resume dan pencocokan deskripsi pekerjaan dengan bantuan AI'}
+              </p>
+              <p className="mt-3 text-sm text-gray-600 dark:text-gray-300" role="note">
+                {language === 'en'
+                  ? 'Resume and job description content is sent for AI processing. Do not upload sensitive information unless you are authorized to share it.'
+                  : 'Isi resume dan deskripsi pekerjaan dikirim untuk diproses AI. Jangan unggah informasi sensitif kecuali Anda berwenang membagikannya.'}
               </p>
             </div>
             <div className="flex-1 flex justify-end">
